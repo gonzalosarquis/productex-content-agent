@@ -1,0 +1,115 @@
+import { NextResponse } from "next/server";
+import { generateWithClaude, splitVariants } from "@/lib/anthropic";
+import { buildCarouselPrompt } from "@/lib/prompts/carouselPrompt";
+import { buildPostPrompt } from "@/lib/prompts/postPrompt";
+import { buildVideoPrompt } from "@/lib/prompts/videoPrompt";
+import {
+  createServerSupabaseClient,
+  createServiceRoleClient,
+} from "@/lib/supabase-server";
+import { buildSystemPrompt } from "@/lib/systemPrompt";
+import type { KnowledgeBase } from "@/lib/types";
+
+export const runtime = "nodejs";
+
+type Body = {
+  format: "carousel" | "video" | "post";
+  subtype: string;
+  tema: string;
+  contexto: string;
+  tono: string[];
+  variants: number;
+  slides?: number;
+  duracion?: string;
+  useTrends?: boolean;
+  knowledgeBase: KnowledgeBase;
+};
+
+export async function POST(req: Request) {
+  try {
+    const supabaseAuth = await createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabaseAuth.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "No autorizado" }, { status: 401 });
+    }
+
+    const body = (await req.json()) as Body;
+    const kb = body.knowledgeBase ?? {
+      brand_dna: "",
+      audience: "",
+      voice: "",
+      products: "",
+      examples: "",
+      refs: "",
+    };
+
+    const system = buildSystemPrompt(kb);
+    let userPrompt: string;
+
+    if (body.format === "carousel") {
+      userPrompt = buildCarouselPrompt({
+        subtipo: body.subtype,
+        tema: body.tema,
+        slides: body.slides ?? 6,
+        contexto: body.contexto,
+        tono: body.tono,
+        variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+      });
+    } else if (body.format === "video") {
+      userPrompt = buildVideoPrompt({
+        estilo: body.subtype,
+        tema: body.tema,
+        duracion: body.duracion ?? "30s",
+        contexto: body.contexto,
+        useTrends: Boolean(body.useTrends),
+        variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+      });
+    } else {
+      userPrompt = buildPostPrompt({
+        subtipo: body.subtype,
+        producto: body.tema,
+        contexto: body.contexto,
+        tono: body.tono,
+        variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+      });
+    }
+
+    const raw = await generateWithClaude({
+      system,
+      user: userPrompt,
+      useTrends: body.format === "video" && Boolean(body.useTrends),
+    });
+
+    const variants = splitVariants(raw);
+
+    const admin = createServiceRoleClient();
+    const { error: insertError } = await admin.from("generations").insert({
+      user_id: user.id,
+      format: body.format,
+      subtype: body.subtype,
+      producto: body.tema,
+      contexto: body.contexto,
+      tono: body.tono,
+      output: { raw, variants },
+    });
+
+    if (insertError) {
+      console.error(insertError);
+      return NextResponse.json(
+        { error: "No se pudo guardar el historial", detail: insertError.message },
+        { status: 500 },
+      );
+    }
+
+    return NextResponse.json({
+      variants,
+      format: body.format,
+      subtype: body.subtype,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : "Error desconocido";
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
+}
