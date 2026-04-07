@@ -1,5 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { fetchSuggest } from "@/lib/suggestApi";
+import type { KnowledgeBase } from "@/lib/types";
+import { SuggestFieldInnerSpinner } from "./SuggestFieldInnerSpinner";
+import { SuggestSparkleButton } from "./SuggestSparkleButton";
+
 const estilos = [
   {
     id: "manifiesto" as const,
@@ -40,9 +46,37 @@ export type VideoFormState = {
 type Props = {
   value: VideoFormState;
   onChange: (v: VideoFormState) => void;
+  knowledgeBase: KnowledgeBase;
 };
 
-export function VideoForm({ value, onChange }: Props) {
+export function VideoForm({ value, onChange, knowledgeBase }: Props) {
+  const [suggestLoading, setSuggestLoading] = useState<
+    "tema" | "contexto" | null
+  >(null);
+
+  async function handleSuggest(field: "tema" | "contexto") {
+    setSuggestLoading(field);
+    try {
+      const suggestion = await fetchSuggest({
+        format: "video",
+        subtype: value.estilo,
+        suggest: field,
+        currentTema:
+          field === "contexto" ? value.tema : undefined,
+        knowledgeBase,
+      });
+      if (field === "tema") {
+        onChange({ ...value, tema: suggestion });
+      } else {
+        onChange({ ...value, contexto: suggestion });
+      }
+    } catch {
+      /* silent */
+    } finally {
+      setSuggestLoading(null);
+    }
+  }
+
   return (
     <div className="space-y-4 border-t border-[#2a2a2a] pt-4">
       <p className="text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
@@ -74,14 +108,23 @@ export function VideoForm({ value, onChange }: Props) {
         })}
       </div>
       <div>
-        <label className="mb-1 block text-xs text-[#f5f2ec]/50">
-          Tema o producto
-        </label>
-        <input
-          value={value.tema}
-          onChange={(e) => onChange({ ...value, tema: e.target.value })}
-          className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00]"
-        />
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label className="text-xs text-[#f5f2ec]/50">Tema o producto</label>
+          <SuggestSparkleButton
+            loading={suggestLoading === "tema"}
+            onClick={() => handleSuggest("tema")}
+            aria-label="Sugerir tema con IA"
+          />
+        </div>
+        <div className="relative">
+          <SuggestFieldInnerSpinner show={suggestLoading === "tema"} />
+          <input
+            value={value.tema}
+            onChange={(e) => onChange({ ...value, tema: e.target.value })}
+            disabled={suggestLoading === "tema"}
+            className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 pr-10 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00] disabled:opacity-60"
+          />
+        </div>
       </div>
       <div>
         <label className="mb-1 block text-xs text-[#f5f2ec]/50">
@@ -105,15 +148,24 @@ export function VideoForm({ value, onChange }: Props) {
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-xs text-[#f5f2ec]/50">
-          Contexto adicional
-        </label>
-        <textarea
-          value={value.contexto}
-          onChange={(e) => onChange({ ...value, contexto: e.target.value })}
-          rows={4}
-          className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00]"
-        />
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label className="text-xs text-[#f5f2ec]/50">Contexto adicional</label>
+          <SuggestSparkleButton
+            loading={suggestLoading === "contexto"}
+            onClick={() => handleSuggest("contexto")}
+            aria-label="Sugerir contexto con IA"
+          />
+        </div>
+        <div className="relative">
+          <SuggestFieldInnerSpinner show={suggestLoading === "contexto"} multiline />
+          <textarea
+            value={value.contexto}
+            onChange={(e) => onChange({ ...value, contexto: e.target.value })}
+            disabled={suggestLoading === "contexto"}
+            rows={4}
+            className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 pr-10 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00] disabled:opacity-60"
+          />
+        </div>
       </div>
       {value.estilo === "tendencia" ? (
         <label className="flex cursor-pointer items-center gap-3 border border-[#2a2a2a] bg-[#1a1a1a] px-3 py-3">

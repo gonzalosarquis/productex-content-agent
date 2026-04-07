@@ -2,13 +2,14 @@
 
 import { useCallback, useEffect, useState } from "react";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { mergeProductsField } from "@/lib/mergeProducts";
 import type { KnowledgeBase } from "@/lib/types";
 
 const empty: KnowledgeBase = {
   brand_dna: "",
   audience: "",
   voice: "",
-  products: "",
+  products: mergeProductsField(""),
   examples: "",
   refs: "",
 };
@@ -44,7 +45,7 @@ export function KnowledgeBasePanel({
         brand_dna: data.brand_dna ?? "",
         audience: data.audience ?? "",
         voice: data.voice ?? "",
-        products: data.products ?? "",
+        products: mergeProductsField(data.products ?? ""),
         examples: data.examples ?? "",
         refs: data.refs ?? "",
       };

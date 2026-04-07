@@ -52,6 +52,20 @@ export async function generateWithClaude(params: {
   return extractTextFromContent(response.content);
 }
 
+export async function generateSuggestion(params: {
+  system: string;
+  user: string;
+}): Promise<string> {
+  const anthropic = getAnthropic();
+  const response = await anthropic.messages.create({
+    model: "claude-sonnet-4-20250514",
+    max_tokens: 200,
+    system: params.system,
+    messages: [{ role: "user", content: params.user }],
+  });
+  return extractTextFromContent(response.content).trim();
+}
+
 export function splitVariants(raw: string): string[] {
   const parts = raw.split(/===VARIANTE===/g).map((s) => s.trim());
   return parts.length ? parts : [raw.trim()];

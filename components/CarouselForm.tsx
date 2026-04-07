@@ -1,5 +1,11 @@
 "use client";
 
+import { useState } from "react";
+import { fetchSuggest } from "@/lib/suggestApi";
+import type { KnowledgeBase } from "@/lib/types";
+import { SuggestFieldInnerSpinner } from "./SuggestFieldInnerSpinner";
+import { SuggestSparkleButton } from "./SuggestSparkleButton";
+
 const subtipos = [
   { id: "educativo", label: "Educativo" },
   { id: "manifiesto", label: "Manifiesto" },
@@ -22,9 +28,37 @@ export type CarouselFormState = {
 type Props = {
   value: CarouselFormState;
   onChange: (v: CarouselFormState) => void;
+  knowledgeBase: KnowledgeBase;
 };
 
-export function CarouselForm({ value, onChange }: Props) {
+export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
+  const [suggestLoading, setSuggestLoading] = useState<
+    "tema" | "contexto" | null
+  >(null);
+
+  async function handleSuggest(field: "tema" | "contexto") {
+    setSuggestLoading(field);
+    try {
+      const suggestion = await fetchSuggest({
+        format: "carousel",
+        subtype: value.subtipo,
+        suggest: field,
+        currentTema:
+          field === "contexto" ? value.tema : undefined,
+        knowledgeBase,
+      });
+      if (field === "tema") {
+        onChange({ ...value, tema: suggestion });
+      } else {
+        onChange({ ...value, contexto: suggestion });
+      }
+    } catch {
+      /* silent — optional: toast */
+    } finally {
+      setSuggestLoading(null);
+    }
+  }
+
   function toggleTono(t: string) {
     const set = new Set(value.tono);
     if (set.has(t)) set.delete(t);
@@ -54,15 +88,24 @@ export function CarouselForm({ value, onChange }: Props) {
         ))}
       </div>
       <div>
-        <label className="mb-1 block text-xs text-[#f5f2ec]/50">
-          Tema o producto
-        </label>
-        <input
-          value={value.tema}
-          onChange={(e) => onChange({ ...value, tema: e.target.value })}
-          className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00]"
-          placeholder="Ej: buzos frisa / mínimos express"
-        />
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label className="text-xs text-[#f5f2ec]/50">Tema o producto</label>
+          <SuggestSparkleButton
+            loading={suggestLoading === "tema"}
+            onClick={() => handleSuggest("tema")}
+            aria-label="Sugerir tema con IA"
+          />
+        </div>
+        <div className="relative">
+          <SuggestFieldInnerSpinner show={suggestLoading === "tema"} />
+          <input
+            value={value.tema}
+            onChange={(e) => onChange({ ...value, tema: e.target.value })}
+            disabled={suggestLoading === "tema"}
+            className="w-full border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 pr-10 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00] disabled:opacity-60"
+            placeholder="Ej: buzos frisa / mínimos express"
+          />
+        </div>
       </div>
       <div>
         <label className="mb-1 block text-xs text-[#f5f2ec]/50">
@@ -86,16 +129,25 @@ export function CarouselForm({ value, onChange }: Props) {
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-xs text-[#f5f2ec]/50">
-          Contexto adicional
-        </label>
-        <textarea
-          value={value.contexto}
-          onChange={(e) => onChange({ ...value, contexto: e.target.value })}
-          rows={4}
-          className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00]"
-          placeholder="Detalle lo que tiene que resolver el carrusel…"
-        />
+        <div className="mb-1 flex items-center justify-between gap-2">
+          <label className="text-xs text-[#f5f2ec]/50">Contexto adicional</label>
+          <SuggestSparkleButton
+            loading={suggestLoading === "contexto"}
+            onClick={() => handleSuggest("contexto")}
+            aria-label="Sugerir contexto con IA"
+          />
+        </div>
+        <div className="relative">
+          <SuggestFieldInnerSpinner show={suggestLoading === "contexto"} multiline />
+          <textarea
+            value={value.contexto}
+            onChange={(e) => onChange({ ...value, contexto: e.target.value })}
+            disabled={suggestLoading === "contexto"}
+            rows={4}
+            className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 pr-10 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00] disabled:opacity-60"
+            placeholder="Detalle lo que tiene que resolver el carrusel…"
+          />
+        </div>
       </div>
       <div>
         <p className="mb-2 text-xs text-[#f5f2ec]/50">Tono (multi)</p>

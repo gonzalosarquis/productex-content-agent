@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createBrowserSupabaseClient } from "@/lib/supabase";
+import { mergeProductsField } from "@/lib/mergeProducts";
 import type { KnowledgeBase } from "@/lib/types";
 import type { GenerationFormat } from "@/lib/types";
 import { CarouselOutput } from "@/components/CarouselOutput";
@@ -19,7 +20,7 @@ const emptyKb: KnowledgeBase = {
   brand_dna: "",
   audience: "",
   voice: "",
-  products: "",
+  products: mergeProductsField(""),
   examples: "",
   refs: "",
 };
@@ -147,6 +148,7 @@ export default function DashboardPage() {
         onVariantsChange={setVariantCount}
         onGenerate={handleGenerate}
         generating={generating}
+        knowledgeBase={kb}
         footer={
           <button
             type="button"
@@ -222,11 +224,15 @@ export default function DashboardPage() {
             </div>
           ) : null}
 
-          {mainTab === "kb" ? (
-            <div className="mx-auto max-w-3xl">
-              <KnowledgeBasePanel onKbChange={setKb} />
-            </div>
-          ) : null}
+          <div
+            className={
+              mainTab === "kb"
+                ? "mx-auto max-w-3xl"
+                : "hidden"
+            }
+          >
+            <KnowledgeBasePanel onKbChange={setKb} />
+          </div>
 
           {mainTab === "history" ? (
             <div className="mx-auto max-w-3xl">

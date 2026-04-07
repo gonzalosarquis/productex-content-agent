@@ -1,7 +1,7 @@
 "use client";
 
 import type { ReactNode } from "react";
-import type { GenerationFormat } from "@/lib/types";
+import type { GenerationFormat, KnowledgeBase } from "@/lib/types";
 import { CarouselForm, type CarouselFormState } from "./CarouselForm";
 import { FormatSelector } from "./FormatSelector";
 import { PostForm, type PostFormState } from "./PostForm";
@@ -20,6 +20,7 @@ type Props = {
   onVariantsChange: (n: 1 | 2 | 3) => void;
   onGenerate: () => void;
   generating: boolean;
+  knowledgeBase: KnowledgeBase;
   footer?: ReactNode;
 };
 
@@ -36,6 +37,7 @@ export function Sidebar({
   onVariantsChange,
   onGenerate,
   generating,
+  knowledgeBase,
   footer,
 }: Props) {
   return (
@@ -55,13 +57,25 @@ export function Sidebar({
           <FormatSelector value={format} onChange={onFormatChange} />
 
           {format === "carousel" ? (
-            <CarouselForm value={carousel} onChange={onCarouselChange} />
+            <CarouselForm
+              value={carousel}
+              onChange={onCarouselChange}
+              knowledgeBase={knowledgeBase}
+            />
           ) : null}
           {format === "video" ? (
-            <VideoForm value={video} onChange={onVideoChange} />
+            <VideoForm
+              value={video}
+              onChange={onVideoChange}
+              knowledgeBase={knowledgeBase}
+            />
           ) : null}
           {format === "post" ? (
-            <PostForm value={post} onChange={onPostChange} />
+            <PostForm
+              value={post}
+              onChange={onPostChange}
+              knowledgeBase={knowledgeBase}
+            />
           ) : null}
 
           <div className="space-y-2 border-t border-[#2a2a2a] pt-4">
