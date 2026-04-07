@@ -5,15 +5,26 @@ import {
   ASPECT_RATIOS,
   CREATIVE_MODELS,
   DEFAULT_CREATIVE_MODEL,
+  IMAGE_SIZE_LABELS,
   IMAGE_SIZES,
   type AspectRatioId,
   type CreativeModelId,
   type ImageSizeId,
 } from "@/lib/creativeModels";
+import { MAX_DESIGN_PASS_CHARS } from "@/lib/designPass";
+import {
+  MAX_DECODED_BYTES_PER_IMAGE,
+  MAX_REFERENCE_IMAGES,
+} from "@/lib/referenceImages";
 import { humanizeGeminiError } from "@/lib/geminiApiError";
 import { splitCarouselIdeation } from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
 import type { KnowledgeBase } from "@/lib/types";
+
+/** En build de producción el servidor fija 1K salvo bypass (ver .env.example). */
+const IMAGE_SIZE_LOCKED =
+  process.env.NODE_ENV === "production" &&
+  process.env.NEXT_PUBLIC_GEMINI_ALLOW_IMAGE_SIZE_OPTIONS !== "true";
 
 type Props = {
   format: "carousel" | "post" | "video";
@@ -32,6 +43,41 @@ function dataUrl(mime: string, b64: string) {
   return `data:${mime};base64,${b64}`;
 }
 
+type RefPayload = { mimeType: string; data: string };
+
+function readFileAsRefPayload(file: File): Promise<RefPayload> {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => {
+      const res = String(r.result ?? "");
+      const m = /^data:([^;]+);base64,(.+)$/.exec(res.trim());
+      if (!m) {
+        reject(new Error("No se pudo leer la imagen"));
+        return;
+      }
+      const mime = m[1]!.trim().toLowerCase();
+      const data = m[2]!.replace(/\s/g, "");
+      const pad = data.endsWith("==") ? 2 : data.endsWith("=") ? 1 : 0;
+      const bytes = Math.floor((data.length * 3) / 4) - pad;
+      if (bytes > MAX_DECODED_BYTES_PER_IMAGE) {
+        reject(
+          new Error(
+            `Imagen demasiado grande (máx. ~${Math.round(MAX_DECODED_BYTES_PER_IMAGE / 1024)} KB)`,
+          ),
+        );
+        return;
+      }
+      if (!["image/png", "image/jpeg", "image/webp"].includes(mime)) {
+        reject(new Error("Usá PNG, JPEG o WebP"));
+        return;
+      }
+      resolve({ mimeType: mime === "image/jpg" ? "image/jpeg" : mime, data });
+    };
+    r.onerror = () => reject(r.error ?? new Error("Lectura fallida"));
+    r.readAsDataURL(file);
+  });
+}
+
 export function CreativesSection({ format, raw, knowledgeBase }: Props) {
   const [model, setModel] = useState<CreativeModelId>(DEFAULT_CREATIVE_MODEL);
   const [aspectRatio, setAspectRatio] = useState<AspectRatioId>("3:4");
@@ -44,6 +90,9 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
   );
   const [postImage, setPostImage] = useState<string | null>(null);
   const [videoImage, setVideoImage] = useState<string | null>(null);
+  const [referenceImages, setReferenceImages] = useState<RefPayload[]>([]);
+  const [refError, setRefError] = useState<string | null>(null);
+  const [designPass, setDesignPass] = useState("");
 
   const carouselSlides = useMemo(() => {
     if (format !== "carousel") return [];
@@ -53,15 +102,35 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
 
   const disabled = !raw.trim() || busy;
 
+  const effectiveImageSize: ImageSizeId = IMAGE_SIZE_LOCKED
+    ? "1K"
+    : imageSize;
+
   const payloadBase = useMemo(
     () => ({
       knowledgeBase,
       model,
       aspectRatio,
-      imageSize,
+      imageSize: effectiveImageSize,
       raw,
+      ...(referenceImages.length > 0
+        ? { referenceImages }
+        : {}),
+      ...(designPass.trim()
+        ? {
+            designPass: designPass.trim().slice(0, MAX_DESIGN_PASS_CHARS),
+          }
+        : {}),
     }),
-    [knowledgeBase, model, aspectRatio, imageSize, raw],
+    [
+      knowledgeBase,
+      model,
+      aspectRatio,
+      effectiveImageSize,
+      raw,
+      referenceImages,
+      designPass,
+    ],
   );
 
   const runCarouselOne = useCallback(
@@ -209,21 +278,28 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
     <div className="rounded-2xl border border-neutral-200/90 bg-neutral-50/80 p-6 shadow-sm">
       <div className="mb-4">
         <h3 className="text-sm font-bold text-neutral-900">
-          Creativos (Gemini / Nano Banana)
+          Creativos (Gemini)
         </h3>
-          <p className="text-xs text-neutral-500">
-          Imágenes usando tu base de conocimiento. Configurá{" "}
+        <p className="text-xs text-neutral-500">
+          Preset recomendado:{" "}
+          <strong className="text-neutral-700">2.5 Flash Image + 1K</strong>{" "}
+          (mejor coste/calidad para feed). En producción la resolución queda en{" "}
+          <strong>1K</strong> salvo variables de entorno de bypass.           La <strong>base fija de estética</strong> va en Base de conocimiento →
+          «Dirección visual para creativos». Acá podés sumar un{" "}
+          <strong>pase extra</strong> puntual y/o hasta{" "}
+          {MAX_REFERENCE_IMAGES} imágenes de referencia. Configurá{" "}
           <code className="rounded bg-white px-1 py-0.5 text-[11px]">
             GEMINI_API_KEY
           </code>{" "}
-          (Google AI Studio) en el servidor.           En la API, el modelo con más cuota gratis suele ser{" "}
-          <strong>gemini-2.5-flash-image</strong> (elige «Gratis / base» arriba).
-          Podés fijarlo en el servidor con{" "}
+          en el servidor. Opcional:{" "}
           <code className="rounded bg-white px-1 py-0.5 text-[11px]">
-            GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+            GEMINI_IMAGE_MODEL
           </code>{" "}
-          para ignorar otros modelos. Los *preview* a veces tienen cuota 0 en
-          free tier (error 429).
+          y{" "}
+          <code className="rounded bg-white px-1 py-0.5 text-[11px]">
+            GEMINI_IMAGE_SIZE
+          </code>{" "}
+          para forzar modelo y resolución en deploy.
         </p>
       </div>
 
@@ -263,18 +339,125 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
         <label className="block text-xs font-semibold text-neutral-700">
           Resolución
           <select
-            value={imageSize}
+            value={effectiveImageSize}
             onChange={(e) => setImageSize(e.target.value as ImageSizeId)}
-            className="mt-1.5 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm"
-            disabled={busy}
+            className="mt-1.5 w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-70"
+            disabled={busy || IMAGE_SIZE_LOCKED}
           >
             {IMAGE_SIZES.map((s) => (
               <option key={s} value={s}>
-                {s}
+                {IMAGE_SIZE_LABELS[s]}
               </option>
             ))}
           </select>
+          {IMAGE_SIZE_LOCKED ? (
+            <span className="mt-1 block text-[11px] font-normal text-neutral-500">
+              Fijo en 1K en producción. En local (<code className="rounded bg-white px-0.5">npm run dev</code>)
+              podés elegir 2K/4K. Bypass:{" "}
+              <code className="rounded bg-white px-0.5">GEMINI_ALLOW_IMAGE_SIZE_OPTIONS</code>{" "}
+              +{" "}
+              <code className="rounded bg-white px-0.5">
+                NEXT_PUBLIC_GEMINI_ALLOW_IMAGE_SIZE_OPTIONS
+              </code>
+              .
+            </span>
+          ) : null}
         </label>
+      </div>
+
+      <div className="mb-4">
+        <label className="block text-xs font-semibold text-neutral-700">
+          Pase de diseño (opcional, texto)
+          <textarea
+            value={designPass}
+            onChange={(e) =>
+              setDesignPass(e.target.value.slice(0, MAX_DESIGN_PASS_CHARS))
+            }
+            rows={4}
+            placeholder="Ej.: paleta #0A0A0A / #FAFAFA, sans geométrica, mucho aire, fotografía natural soft light, sin stock obvio… O pegá acá un brief que te arme otra persona / asistente."
+            className="mt-1.5 w-full resize-y rounded-lg border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-800 placeholder:text-neutral-400"
+            disabled={busy}
+          />
+        </label>
+        <p className="mt-1 text-[11px] text-neutral-500">
+          {designPass.length}/{MAX_DESIGN_PASS_CHARS} — Complementa o reemplaza referencias
+          visuales si solo tenés una descripción. Podés combinar ambos.
+        </p>
+      </div>
+
+      <div className="mb-4 rounded-xl border border-dashed border-neutral-300 bg-white/60 px-4 py-3">
+        <label className="block text-xs font-semibold text-neutral-700">
+          Referencias visuales (opcional)
+          <input
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            multiple
+            className="mt-1.5 block w-full text-xs text-neutral-600 file:mr-3 file:rounded-lg file:border-0 file:bg-neutral-900 file:px-3 file:py-1.5 file:text-xs file:font-semibold file:text-white"
+            disabled={busy}
+            onChange={async (e) => {
+              setRefError(null);
+              const files = Array.from(e.target.files ?? []);
+              e.target.value = "";
+              if (files.length === 0) return;
+              if (
+                referenceImages.length + files.length >
+                MAX_REFERENCE_IMAGES
+              ) {
+                setRefError(
+                  `Máximo ${MAX_REFERENCE_IMAGES} referencias (ya tenés ${referenceImages.length}).`,
+                );
+                return;
+              }
+              const next: RefPayload[] = [];
+              try {
+                for (const f of files) {
+                  next.push(await readFileAsRefPayload(f));
+                }
+                setReferenceImages((prev) => [...prev, ...next]);
+              } catch (err) {
+                setRefError(
+                  err instanceof Error ? err.message : "No se pudo cargar la imagen",
+                );
+              }
+            }}
+          />
+        </label>
+        {refError ? (
+          <p className="mt-2 text-xs text-red-600">{refError}</p>
+        ) : (
+          <p className="mt-2 text-xs text-neutral-500">
+            PNG/JPEG/WebP, ~{Math.round(MAX_DECODED_BYTES_PER_IMAGE / 1024)} KB
+            c/u. El modelo usa estas piezas como guía de estilo (no copia logos ni
+            marcas).
+          </p>
+        )}
+        {referenceImages.length > 0 ? (
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {referenceImages.map((r, i) => (
+              <li
+                key={`${r.data.slice(0, 12)}-${i}`}
+                className="relative h-16 w-16 overflow-hidden rounded-lg border border-neutral-200 bg-neutral-100"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={dataUrl(r.mimeType, r.data)}
+                  alt=""
+                  className="h-full w-full object-cover"
+                />
+                <button
+                  type="button"
+                  className="absolute right-0.5 top-0.5 rounded bg-neutral-900/80 px-1 text-[10px] font-bold text-white"
+                  onClick={() =>
+                    setReferenceImages((prev) => prev.filter((_, j) => j !== i))
+                  }
+                  disabled={busy}
+                >
+                  ×
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
 
       {error ? (

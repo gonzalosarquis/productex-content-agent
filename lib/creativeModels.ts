@@ -2,24 +2,24 @@
 export const CREATIVE_MODELS = [
   {
     id: "gemini-2.5-flash-image",
-    label: "Gratis / base — 2.5 Flash Image",
-    hint: "Modelo estable con más cuota en free tier (API). Evitá *-preview si ves 429.",
+    label: "Recomendado — 2.5 Flash Image",
+    hint: "Mejor relación calidad/precio (API paga). Cuota free más amable que *-preview. Imágenes de referencia: sí.",
   },
   {
     id: "gemini-3.1-flash-image-preview",
-    label: "Equilibrado (3.1 Flash Image)",
-    hint: "Nano Banana 2 — suele exigir facturación; si ves error 429, usá 2.5",
+    label: "Más calidad — 3.1 Flash Image",
+    hint: "Mejor detalle; ~70% más caro que 2.5 a 1K. Suele exigir billing. Refs: sí.",
   },
   {
     id: "gemini-3-pro-image-preview",
-    label: "Máxima calidad (3 Pro Image)",
-    hint: "Nano Banana Pro — texto y detalle",
+    label: "Máxima calidad — 3 Pro Image",
+    hint: "Premium; revisá pricing. Refs: sí.",
   },
 ] as const;
 
 export type CreativeModelId = (typeof CREATIVE_MODELS)[number]["id"];
 
-/** 2.5 suele estar disponible en más cuentas; 3.1/3 Pro se eligen en la UI. */
+/** Default: coste optimizado + buena calidad en feed. */
 export const DEFAULT_CREATIVE_MODEL: CreativeModelId =
   "gemini-2.5-flash-image";
 
@@ -35,3 +35,10 @@ export type AspectRatioId = (typeof ASPECT_RATIOS)[number]["id"];
 
 export const IMAGE_SIZES = ["1K", "2K", "4K"] as const;
 export type ImageSizeId = (typeof IMAGE_SIZES)[number];
+
+/** Label corto para UI: 1K = mejor coste para feed típico. */
+export const IMAGE_SIZE_LABELS: Record<ImageSizeId, string> = {
+  "1K": "1K — recomendado coste/calidad (feed)",
+  "2K": "2K — más detalle",
+  "4K": "4K — máximo detalle (más caro)",
+};

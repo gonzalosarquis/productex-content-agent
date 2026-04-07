@@ -1,8 +1,16 @@
 import type { KnowledgeBase } from "@/lib/types";
 import type { CarouselSlide } from "@/lib/parseCarousel";
 
+/** Límite de texto por request; JSON o brief largo caben si priorizamos esto. */
+const VISUAL_DIRECTION_MAX = 12_000;
+
 function kbBlock(kb: KnowledgeBase): string {
   const chunks: string[] = [];
+  if (kb.visual_direction?.trim()) {
+    chunks.push(
+      `DIRECTIVA VISUAL DEL SISTEMA (prioridad para creativos; podés recibir JSON o texto):\n${kb.visual_direction.trim().slice(0, VISUAL_DIRECTION_MAX)}`,
+    );
+  }
   if (kb.brand_dna?.trim()) chunks.push(`ADN de marca: ${kb.brand_dna.trim()}`);
   if (kb.audience?.trim()) chunks.push(`Audiencia: ${kb.audience.trim()}`);
   if (kb.voice?.trim()) chunks.push(`Voz y personalidad: ${kb.voice.trim()}`);

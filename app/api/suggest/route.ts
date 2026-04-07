@@ -32,6 +32,7 @@ export async function POST(req: Request) {
 
     const body = (await req.json()) as Body;
     const kb = body.knowledgeBase ?? {
+      visual_direction: "",
       brand_dna: "",
       audience: "",
       voice: "",

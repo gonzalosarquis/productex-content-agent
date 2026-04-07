@@ -1,16 +1,20 @@
 import { NextResponse } from "next/server";
+import { ASPECT_RATIOS, type AspectRatioId } from "@/lib/creativeModels";
+import { designPassBlock, parseDesignPass } from "@/lib/designPass";
 import {
-  ASPECT_RATIOS,
-  type AspectRatioId,
-  type ImageSizeId,
-} from "@/lib/creativeModels";
+  parseReferenceImages,
+  referenceStyleBlock,
+} from "@/lib/referenceImages";
 import {
   buildCarouselSlidePrompt,
   buildPostCreativePrompt,
   buildVideoCreativePrompt,
 } from "@/lib/buildImagePrompt";
 import { generateGeminiImage } from "@/lib/geminiCreative";
-import { resolveGeminiImageModel } from "@/lib/resolveGeminiImageModel";
+import {
+  resolveGeminiImageModel,
+  resolveGeminiImageSize,
+} from "@/lib/resolveGeminiImageModel";
 import { splitCarouselIdeation, splitPostIdeation, splitVideoIdeation } from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
 import { parsePostOutput } from "@/lib/parsePost";
@@ -37,6 +41,10 @@ type Body = {
   model?: string;
   aspectRatio?: string;
   imageSize?: string;
+  /** Hasta 3 imágenes base64 { mimeType, data } para alinear estética */
+  referenceImages?: unknown;
+  /** Referencia escrita (pase de diseño / moodboard en texto); opcional */
+  designPass?: string;
   /** Carrusel: índice 0-based del slide, o omitir con batch */
   slideIndex?: number;
   /** Si true, genera todas las slides (carrusel) */
@@ -75,6 +83,7 @@ export async function POST(req: Request) {
     }
 
     const kb: KnowledgeBase = body.knowledgeBase ?? {
+      visual_direction: "",
       brand_dna: "",
       audience: "",
       voice: "",
@@ -89,11 +98,22 @@ export async function POST(req: Request) {
       ? (body.aspectRatio as AspectRatioId)
       : "3:4";
 
-    const imageSize = (["1K", "2K", "4K"] as const).includes(
-      body.imageSize as ImageSizeId,
-    )
-      ? (body.imageSize as ImageSizeId)
-      : "1K";
+    const imageSize = resolveGeminiImageSize(body.imageSize);
+
+    const refParsed = parseReferenceImages(body.referenceImages);
+    if (!refParsed.ok) {
+      return NextResponse.json({ error: refParsed.error }, { status: 400 });
+    }
+    const refInputs =
+      refParsed.images.length > 0
+        ? refParsed.images.map((r) => ({
+            mimeType: r.mimeType,
+            base64: r.data,
+          }))
+        : undefined;
+    const refSuffix = referenceStyleBlock(refParsed.images.length);
+    const designPass = parseDesignPass(body.designPass);
+    const designSuffix = designPassBlock(designPass);
 
     const arLabel = aspectLabel(aspectRatio);
 
@@ -122,19 +142,21 @@ export async function POST(req: Request) {
           );
         }
         const slide = slides[idx]!;
-        const prompt = buildCarouselSlidePrompt(
-          kb,
-          slide,
-          idx,
-          slides.length,
-          arLabel,
-        );
+        const prompt =
+          buildCarouselSlidePrompt(
+            kb,
+            slide,
+            idx,
+            slides.length,
+            arLabel,
+          ) + designSuffix + refSuffix;
         const result = await generateGeminiImage({
           apiKey: key,
           model,
           prompt,
           aspectRatio,
           imageSize,
+          referenceImages: refInputs,
         });
         if (!result.ok) {
           return NextResponse.json({ error: result.error }, { status: 502 });
@@ -156,19 +178,21 @@ export async function POST(req: Request) {
 
       for (let i = 0; i < slides.length; i++) {
         const slide = slides[i]!;
-        const prompt = buildCarouselSlidePrompt(
-          kb,
-          slide,
-          i,
-          slides.length,
-          arLabel,
-        );
+        const prompt =
+          buildCarouselSlidePrompt(
+            kb,
+            slide,
+            i,
+            slides.length,
+            arLabel,
+          ) + designSuffix + refSuffix;
         const result = await generateGeminiImage({
           apiKey: key,
           model,
           prompt,
           aspectRatio,
           imageSize,
+          referenceImages: refInputs,
         });
         if (result.ok) {
           results.push({
@@ -190,18 +214,20 @@ export async function POST(req: Request) {
     if (body.format === "post") {
       const { body: postBody } = splitPostIdeation(raw);
       const parsed = parsePostOutput(postBody);
-      const prompt = buildPostCreativePrompt(
-        kb,
-        parsed.hook,
-        parsed.cuerpo,
-        arLabel,
-      );
+      const prompt =
+        buildPostCreativePrompt(
+          kb,
+          parsed.hook,
+          parsed.cuerpo,
+          arLabel,
+        ) + designSuffix + refSuffix;
       const result = await generateGeminiImage({
         apiKey: key,
         model,
         prompt,
         aspectRatio,
         imageSize,
+        referenceImages: refInputs,
       });
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 502 });
@@ -226,19 +252,21 @@ export async function POST(req: Request) {
         })
         .join("\n\n");
 
-      const prompt = buildVideoCreativePrompt(
-        kb,
-        scriptExcerpt,
-        parsed.caption,
-        parsed.musica,
-        arLabel,
-      );
+      const prompt =
+        buildVideoCreativePrompt(
+          kb,
+          scriptExcerpt,
+          parsed.caption,
+          parsed.musica,
+          arLabel,
+        ) + designSuffix + refSuffix;
       const result = await generateGeminiImage({
         apiKey: key,
         model,
         prompt,
         aspectRatio,
         imageSize,
+        referenceImages: refInputs,
       });
       if (!result.ok) {
         return NextResponse.json({ error: result.error }, { status: 502 });

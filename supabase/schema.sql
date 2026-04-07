@@ -24,6 +24,7 @@ create table if not exists public.knowledge_base (
   products text not null default '',
   examples text not null default '',
   refs text not null default '',
+  visual_direction text not null default '',
   updated_at timestamptz not null default now(),
   unique (user_id)
 );

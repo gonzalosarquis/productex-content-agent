@@ -1,4 +1,9 @@
 export interface KnowledgeBase {
+  /**
+   * Base fija para creativos (Gemini): dirección de arte, paleta, tipografía, etc.
+   * Podés pegar texto largo o JSON; se inyecta en cada generación de imagen.
+   */
+  visual_direction: string;
   brand_dna: string;
   audience: string;
   voice: string;

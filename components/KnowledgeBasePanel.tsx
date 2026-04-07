@@ -6,6 +6,7 @@ import { mergeProductsField } from "@/lib/mergeProducts";
 import type { KnowledgeBase } from "@/lib/types";
 
 const empty: KnowledgeBase = {
+  visual_direction: "",
   brand_dna: "",
   audience: "",
   voice: "",
@@ -41,7 +42,10 @@ export function KnowledgeBasePanel({
       .maybeSingle();
 
     if (data) {
+      const row = data as Record<string, unknown>;
       const next: KnowledgeBase = {
+        visual_direction:
+          typeof row.visual_direction === "string" ? row.visual_direction : "",
         brand_dna: data.brand_dna ?? "",
         audience: data.audience ?? "",
         voice: data.voice ?? "",
@@ -76,6 +80,7 @@ export function KnowledgeBasePanel({
     const { error } = await supabase.from("knowledge_base").upsert(
       {
         user_id: user.id,
+        visual_direction: kb.visual_direction,
         brand_dna: kb.brand_dna,
         audience: kb.audience,
         voice: kb.voice,
@@ -120,6 +125,28 @@ export function KnowledgeBasePanel({
 
   return (
     <div className="space-y-8">
+      <div>
+        <label className="mb-1.5 block text-xs font-semibold text-neutral-700">
+          Dirección visual para creativos (Gemini) — base del sistema
+        </label>
+        <p className="mb-2 text-xs text-neutral-500">
+          Pegá acá tu brief largo <strong>o</strong> el JSON de identidad visual.
+          Se usa en <strong>cada</strong> generación de imagen (carrusel, post,
+          reel). Los campos de abajo suman contexto; esta es la referencia
+          principal de estética.
+        </p>
+        <textarea
+          value={kb.visual_direction}
+          onChange={(e) => {
+            const next = { ...kb, visual_direction: e.target.value };
+            setKb(next);
+            onKbChange?.(next);
+          }}
+          rows={14}
+          placeholder="Ej.: prompt descriptivo de diseño completo, o el JSON Productex Visual Generation Base…"
+          className="w-full resize-y rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15"
+        />
+      </div>
       {field("brand_dna", "ADN de marca (extra)")}
       {field("audience", "Audiencia (extra)")}
       {field("voice", "Voz (extra)")}

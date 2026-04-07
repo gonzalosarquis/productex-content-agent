@@ -17,6 +17,7 @@ import type { VideoFormState } from "@/components/VideoForm";
 import type { PostFormState } from "@/components/PostForm";
 
 const emptyKb: KnowledgeBase = {
+  visual_direction: "",
   brand_dna: "",
   audience: "",
   voice: "",

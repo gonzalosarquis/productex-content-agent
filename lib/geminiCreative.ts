@@ -1,5 +1,10 @@
-import { GoogleGenAI } from "@google/genai";
-import type { GenerateContentResponse } from "@google/genai";
+import {
+  GoogleGenAI,
+  createPartFromBase64,
+  createPartFromText,
+  createUserContent,
+} from "@google/genai";
+import type { ContentListUnion, GenerateContentResponse } from "@google/genai";
 import {
   humanizeGeminiError,
   parseRetryAfterSecondsFromText,
@@ -7,6 +12,11 @@ import {
 } from "@/lib/geminiApiError";
 import { toGeminiImageAspectRatio } from "@/lib/geminiAspect";
 import type { ImageSizeId } from "@/lib/creativeModels";
+
+export type ReferenceImageInput = {
+  mimeType: string;
+  base64: string;
+};
 
 export type GenerateImageResult =
   | { ok: true; mimeType: string; base64: string }
@@ -56,16 +66,33 @@ function isQuotaOrRateLimit(message: string): boolean {
   );
 }
 
+function buildContents(
+  prompt: string,
+  referenceImages: ReferenceImageInput[] | undefined,
+): ContentListUnion {
+  const refs = referenceImages?.length
+    ? referenceImages
+    : undefined;
+  if (!refs?.length) {
+    return prompt;
+  }
+  return createUserContent([
+    createPartFromText(prompt),
+    ...refs.map((r) => createPartFromBase64(r.base64, r.mimeType)),
+  ]);
+}
+
 async function generateContentWithConfig(
   ai: GoogleGenAI,
   model: string,
   prompt: string,
   ar: string,
   imageSize: ImageSizeId | null,
+  referenceImages: ReferenceImageInput[] | undefined,
 ): Promise<GenerateContentResponse> {
   return ai.models.generateContent({
     model,
-    contents: prompt,
+    contents: buildContents(prompt, referenceImages),
     config: {
       responseModalities: ["TEXT", "IMAGE"],
       imageConfig:
@@ -86,8 +113,10 @@ async function attemptGeneration(params: {
   prompt: string;
   aspectRatio: string;
   imageSize: ImageSizeId;
+  referenceImages?: ReferenceImageInput[];
 }): Promise<GenerateImageResult> {
-  const { apiKey, model, prompt, aspectRatio, imageSize } = params;
+  const { apiKey, model, prompt, aspectRatio, imageSize, referenceImages } =
+    params;
   const ar = toGeminiImageAspectRatio(aspectRatio);
 
   try {
@@ -102,11 +131,19 @@ async function attemptGeneration(params: {
         prompt,
         ar,
         imageSize,
+        referenceImages,
       );
     } catch (first) {
       const msg1 = first instanceof Error ? first.message : String(first);
       try {
-        response = await generateContentWithConfig(ai, model, prompt, ar, null);
+        response = await generateContentWithConfig(
+          ai,
+          model,
+          prompt,
+          ar,
+          null,
+          referenceImages,
+        );
       } catch (second) {
         const msg2 = second instanceof Error ? second.message : String(second);
         return {
@@ -134,6 +171,7 @@ export async function generateGeminiImage(params: {
   prompt: string;
   aspectRatio: string;
   imageSize: ImageSizeId;
+  referenceImages?: ReferenceImageInput[];
 }): Promise<GenerateImageResult> {
   let result = await attemptGeneration(params);
 
