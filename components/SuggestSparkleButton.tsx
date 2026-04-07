@@ -17,11 +17,11 @@ export function SuggestSparkleButton({
       onClick={onClick}
       disabled={loading}
       aria-label={ariaLabel}
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-[#2a2a2a] bg-transparent text-[#c8ff00] transition hover:border-[#c8ff00] disabled:cursor-not-allowed disabled:opacity-100"
+      className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-neutral-200 bg-white text-[#7C3AED] transition hover:border-[#7C3AED] hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-100"
     >
       {loading ? (
         <span
-          className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#c8ff00] border-t-transparent"
+          className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#7C3AED] border-t-transparent"
           aria-hidden
         />
       ) : (

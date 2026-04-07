@@ -29,49 +29,49 @@ export function PostOutput({ raw }: Props) {
     .join("\n\n");
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <IdeationBadges badges={badges} />
 
-      <div className="border border-[#2a2a2a] bg-[#1a1a1a] p-8">
-        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+      <div className="border border-neutral-200 bg-white p-10 shadow-sm">
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-neutral-400">
           Hook
         </p>
         <p
-          className="text-2xl leading-snug text-[#c8ff00]"
+          className="text-2xl leading-snug text-[#7C3AED]"
           style={{ fontFamily: "var(--font-bebas), sans-serif" }}
         >
           {parsed.hook || "—"}
         </p>
       </div>
 
-      <div className="border border-[#2a2a2a] bg-[#0a0a0a] p-8">
-        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+      <div className="border border-neutral-200 bg-white p-10 shadow-sm">
+        <p className="mb-3 text-xs uppercase tracking-[0.2em] text-neutral-400">
           Cuerpo
         </p>
-        <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#f5f2ec]/90">
+        <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-800">
           {parsed.cuerpo || "—"}
         </p>
       </div>
 
-      <div className="border border-[#2a2a2a] bg-[#1a1a1a] p-6">
-        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+      <div className="border border-neutral-200 bg-neutral-50 p-8">
+        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-neutral-400">
           CTA
         </p>
-        <p className="text-sm text-[#f5f2ec]">{parsed.cta || "—"}</p>
+        <p className="text-sm text-neutral-900">{parsed.cta || "—"}</p>
       </div>
 
-      <div className="border border-[#2a2a2a] bg-[#0a0a0a] p-6">
-        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+      <div className="border border-neutral-200 bg-white p-8 shadow-sm">
+        <p className="mb-2 text-xs uppercase tracking-[0.2em] text-neutral-400">
           Hashtags
         </p>
-        <p className="text-sm text-[#c8ff00]/90">{parsed.hashtags || "—"}</p>
+        <p className="text-sm text-[#7C3AED]">{parsed.hashtags || "—"}</p>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={() => copy(block)}
-          className="border border-[#c8ff00] bg-[#c8ff00] px-6 py-2 text-sm font-medium text-black"
+          className="bg-[#7C3AED] px-6 py-2 text-sm font-medium text-white transition hover:bg-[#6d28d9]"
           style={{ fontFamily: "var(--font-bebas), sans-serif" }}
         >
           Copiar todo
@@ -79,21 +79,21 @@ export function PostOutput({ raw }: Props) {
         <button
           type="button"
           onClick={() => copy(parsed.hook)}
-          className="border border-[#2a2a2a] px-4 py-2 text-xs text-[#f5f2ec] hover:border-[#c8ff00]"
+          className="border border-neutral-200 px-4 py-2 text-xs text-neutral-800 transition hover:border-[#7C3AED]"
         >
           Copiar hook
         </button>
         <button
           type="button"
           onClick={() => copy(parsed.cuerpo)}
-          className="border border-[#2a2a2a] px-4 py-2 text-xs text-[#f5f2ec] hover:border-[#c8ff00]"
+          className="border border-neutral-200 px-4 py-2 text-xs text-neutral-800 transition hover:border-[#7C3AED]"
         >
           Copiar cuerpo
         </button>
         <button
           type="button"
           onClick={() => copy(parsed.cta)}
-          className="border border-[#2a2a2a] px-4 py-2 text-xs text-[#f5f2ec] hover:border-[#c8ff00]"
+          className="border border-neutral-200 px-4 py-2 text-xs text-neutral-800 transition hover:border-[#7C3AED]"
         >
           Copiar CTA
         </button>

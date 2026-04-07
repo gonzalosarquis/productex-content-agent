@@ -1,11 +1,13 @@
 @import "tailwindcss";
 
 @theme inline {
-  --color-bg: #0a0a0a;
-  --color-fg: #f5f2ec;
-  --color-accent: #c8ff00;
-  --color-border: #2a2a2a;
-  --color-card: #1a1a1a;
+  --color-bg: #ffffff;
+  --color-fg: #0a0a0a;
+  --color-fg-muted: #737373;
+  --color-accent: #7c3aed;
+  --color-border: #e5e5e5;
+  --color-border-strong: #0a0a0a;
+  --color-card: #fafafa;
   --font-display: var(--font-bebas);
   --font-sans: var(--font-dm);
 }
@@ -14,4 +16,9 @@ body {
   background: var(--color-bg);
   color: var(--color-fg);
   font-family: var(--font-dm), system-ui, sans-serif;
+}
+
+::selection {
+  background: color-mix(in srgb, #7c3aed 18%, transparent);
+  color: var(--color-fg);
 }

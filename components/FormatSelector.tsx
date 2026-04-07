@@ -15,8 +15,8 @@ type Props = {
 
 export function FormatSelector({ value, onChange }: Props) {
   return (
-    <div className="space-y-2">
-      <p className="text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+    <div className="space-y-3">
+      <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">
         Formato
       </p>
       <div className="grid grid-cols-1 gap-2">
@@ -29,8 +29,8 @@ export function FormatSelector({ value, onChange }: Props) {
               onClick={() => onChange(o.id)}
               className={`flex items-center gap-3 border px-4 py-3 text-left transition ${
                 active
-                  ? "border-[#c8ff00] bg-[#0a0a0a] text-[#f5f2ec]"
-                  : "border-[#2a2a2a] bg-[#1a1a1a] text-[#f5f2ec]/70 hover:border-[#2a2a2a]/80"
+                  ? "border-[#7C3AED] bg-violet-50 text-neutral-900"
+                  : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300"
               }`}
             >
               <span className="text-xl">{o.icon}</span>

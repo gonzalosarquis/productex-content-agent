@@ -41,19 +41,21 @@ export function Sidebar({
   footer,
 }: Props) {
   return (
-    <aside className="flex h-screen w-[360px] shrink-0 flex-col border-r border-[#2a2a2a] bg-[#0a0a0a]">
-      <div className="border-b border-[#2a2a2a] px-6 py-6">
+    <aside className="flex h-screen w-[360px] shrink-0 flex-col border-r border-neutral-200 bg-white">
+      <div className="border-b border-neutral-200 px-8 py-10">
         <h1
-          className="text-3xl tracking-wide text-[#f5f2ec]"
+          className="text-3xl tracking-wide text-neutral-900"
           style={{ fontFamily: "var(--font-bebas), sans-serif" }}
         >
           Productex Content Agent
         </h1>
-        <p className="mt-1 text-xs text-[#f5f2ec]/45">@productexok</p>
+        <p className="mt-2 text-xs tracking-wide text-neutral-500">
+          @productexok
+        </p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-6 py-6">
-        <div className="space-y-6">
+      <div className="flex-1 overflow-y-auto px-8 py-8">
+        <div className="space-y-8">
           <FormatSelector value={format} onChange={onFormatChange} />
 
           {format === "carousel" ? (
@@ -78,8 +80,8 @@ export function Sidebar({
             />
           ) : null}
 
-          <div className="space-y-2 border-t border-[#2a2a2a] pt-4">
-            <p className="text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
+          <div className="space-y-3 border-t border-neutral-200 pt-8">
+            <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">
               Variantes
             </p>
             <div className="flex gap-2">
@@ -88,10 +90,10 @@ export function Sidebar({
                   key={n}
                   type="button"
                   onClick={() => onVariantsChange(n)}
-                  className={`flex-1 border py-3 text-xl ${
+                  className={`flex-1 border py-3 text-xl transition ${
                     variants === n
-                      ? "border-[#c8ff00] text-[#c8ff00]"
-                      : "border-[#2a2a2a] text-[#f5f2ec]/40"
+                      ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
+                      : "border-neutral-200 text-neutral-400 hover:border-neutral-300"
                   }`}
                   style={{ fontFamily: "var(--font-bebas), sans-serif" }}
                 >
@@ -103,16 +105,13 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="border-t border-[#2a2a2a] p-6">
+      <div className="border-t border-neutral-200 bg-neutral-50/80 px-8 py-8">
         <button
           type="button"
           onClick={onGenerate}
           disabled={generating}
-          className="w-full py-4 text-xl tracking-wide text-black transition hover:opacity-90 disabled:opacity-50"
-          style={{
-            fontFamily: "var(--font-bebas), sans-serif",
-            backgroundColor: "#c8ff00",
-          }}
+          className="w-full bg-[#7C3AED] py-4 text-xl tracking-wide text-white transition hover:bg-[#6d28d9] disabled:opacity-50"
+          style={{ fontFamily: "var(--font-bebas), sans-serif" }}
         >
           {generating ? "Generando…" : "Generar"}
         </button>

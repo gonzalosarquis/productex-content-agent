@@ -134,7 +134,7 @@ export default function DashboardPage() {
     "";
 
   return (
-    <div className="flex min-h-screen bg-[#0a0a0a]">
+    <div className="flex min-h-screen bg-white">
       <Sidebar
         format={format}
         onFormatChange={setFormat}
@@ -153,15 +153,15 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={signOut}
-            className="mt-4 w-full border border-[#2a2a2a] py-2 text-sm text-[#f5f2ec]/60 hover:text-[#f5f2ec]"
+            className="mt-4 w-full border border-neutral-900 py-2.5 text-sm text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
           >
             Salir
           </button>
         }
       />
 
-      <main className="flex min-h-screen flex-1 flex-col">
-        <div className="flex border-b border-[#2a2a2a]">
+      <main className="flex min-h-screen flex-1 flex-col bg-neutral-50/40">
+        <div className="flex border-b border-neutral-200 bg-white">
           {(
             [
               ["results", "Resultados"],
@@ -173,10 +173,10 @@ export default function DashboardPage() {
               key={id}
               type="button"
               onClick={() => setMainTab(id)}
-              className={`border-b-2 px-8 py-4 text-sm uppercase tracking-wider transition ${
+              className={`border-b-2 px-8 py-5 text-sm uppercase tracking-wider transition ${
                 mainTab === id
-                  ? "border-[#c8ff00] text-[#f5f2ec]"
-                  : "border-transparent text-[#f5f2ec]/45 hover:text-[#f5f2ec]/70"
+                  ? "border-[#7C3AED] text-neutral-900"
+                  : "border-transparent text-neutral-400 hover:text-neutral-700"
               }`}
             >
               {label}
@@ -184,11 +184,11 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto p-10">
+        <div className="flex-1 overflow-y-auto px-12 py-16">
           {mainTab === "results" ? (
             <div className="mx-auto max-w-3xl">
               {error ? (
-                <p className="mb-6 text-sm text-red-400">{error}</p>
+                <p className="mb-6 text-sm text-red-600">{error}</p>
               ) : null}
               {resultVariants.length > 1 ? (
                 <div className="mb-8 flex gap-2">
@@ -197,10 +197,10 @@ export default function DashboardPage() {
                       key={i}
                       type="button"
                       onClick={() => setViewIdx(i)}
-                      className={`border px-6 py-2 text-lg ${
+                      className={`border px-6 py-2 text-lg transition ${
                         viewIdx === i
-                          ? "border-[#c8ff00] text-[#c8ff00]"
-                          : "border-[#2a2a2a] text-[#f5f2ec]/50"
+                          ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
+                          : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                       }`}
                       style={{ fontFamily: "var(--font-bebas), sans-serif" }}
                     >
@@ -211,7 +211,7 @@ export default function DashboardPage() {
               ) : null}
 
               {!rawView ? (
-                <p className="text-[#f5f2ec]/45">
+                <p className="text-neutral-400">
                   Elegí formato, completá el brief y pulsá Generar.
                 </p>
               ) : resultFormat === "carousel" ? (

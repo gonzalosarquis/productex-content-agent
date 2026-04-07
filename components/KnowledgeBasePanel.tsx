@@ -97,7 +97,7 @@ export function KnowledgeBasePanel({
   function field<K extends keyof KnowledgeBase>(key: K, label: string) {
     return (
       <div>
-        <label className="mb-1 block text-xs uppercase tracking-wider text-[#f5f2ec]/40">
+        <label className="mb-1 block text-xs uppercase tracking-wider text-neutral-400">
           {label}
         </label>
         <textarea
@@ -108,18 +108,18 @@ export function KnowledgeBasePanel({
             onKbChange?.(next);
           }}
           rows={key === "examples" || key === "products" ? 5 : 3}
-          className="w-full resize-none border border-[#2a2a2a] bg-[#0a0a0a] px-3 py-2 text-sm text-[#f5f2ec] outline-none focus:border-[#c8ff00]"
+          className="w-full resize-none border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED]"
         />
       </div>
     );
   }
 
   if (loading) {
-    return <p className="text-sm text-[#f5f2ec]/50">Cargando base…</p>;
+    return <p className="text-sm text-neutral-500">Cargando base…</p>;
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {field("brand_dna", "ADN de marca (extra)")}
       {field("audience", "Audiencia (extra)")}
       {field("voice", "Voz (extra)")}
@@ -132,12 +132,12 @@ export function KnowledgeBasePanel({
           type="button"
           onClick={save}
           disabled={saving}
-          className="border border-[#c8ff00] bg-[#c8ff00] px-8 py-2 text-lg text-black disabled:opacity-50"
+          className="bg-[#7C3AED] px-8 py-2 text-lg text-white transition hover:bg-[#6d28d9] disabled:opacity-50"
           style={{ fontFamily: "var(--font-bebas), sans-serif" }}
         >
           {saving ? "Guardando…" : "Guardar base"}
         </button>
-        {msg ? <span className="text-sm text-[#f5f2ec]/60">{msg}</span> : null}
+        {msg ? <span className="text-sm text-neutral-500">{msg}</span> : null}
       </div>
     </div>
   );
