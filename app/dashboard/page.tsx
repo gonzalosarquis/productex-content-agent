@@ -214,11 +214,11 @@ export default function DashboardPage() {
                   Elegí formato, completá el brief y pulsá Generar.
                 </p>
               ) : resultFormat === "carousel" ? (
-                <CarouselOutput raw={rawView} />
+                <CarouselOutput raw={rawView} knowledgeBase={kb} />
               ) : resultFormat === "video" ? (
-                <VideoOutput raw={rawView} />
+                <VideoOutput raw={rawView} knowledgeBase={kb} />
               ) : (
-                <PostOutput raw={rawView} />
+                <PostOutput raw={rawView} knowledgeBase={kb} />
               )}
             </div>
           ) : null}

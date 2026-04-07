@@ -7,9 +7,12 @@ import {
 } from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
 import { IdeationBadges } from "./IdeationBadges";
+import { CreativesSection } from "./CreativesSection";
+import type { KnowledgeBase } from "@/lib/types";
 
 type Props = {
   raw: string;
+  knowledgeBase: KnowledgeBase;
 };
 
 function kindLabel(k: string) {
@@ -18,7 +21,7 @@ function kindLabel(k: string) {
   return "contenido";
 }
 
-export function CarouselOutput({ raw }: Props) {
+export function CarouselOutput({ raw, knowledgeBase }: Props) {
   const { ideation, body } = useMemo(
     () => splitCarouselIdeation(raw),
     [raw],
@@ -45,6 +48,12 @@ export function CarouselOutput({ raw }: Props) {
   return (
     <div className="space-y-10">
       <IdeationBadges badges={badges} />
+
+      <CreativesSection
+        format="carousel"
+        raw={raw}
+        knowledgeBase={knowledgeBase}
+      />
 
       {slide ? (
         <div className="relative rounded-2xl border border-neutral-200/90 bg-white p-10 shadow-sm">

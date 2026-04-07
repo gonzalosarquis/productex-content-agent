@@ -7,12 +7,15 @@ import {
 } from "@/lib/ideationBadges";
 import { parseVideoOutput } from "@/lib/parseVideo";
 import { IdeationBadges } from "./IdeationBadges";
+import { CreativesSection } from "./CreativesSection";
+import type { KnowledgeBase } from "@/lib/types";
 
 type Props = {
   raw: string;
+  knowledgeBase: KnowledgeBase;
 };
 
-export function VideoOutput({ raw }: Props) {
+export function VideoOutput({ raw, knowledgeBase }: Props) {
   const { ideation, body } = useMemo(() => splitVideoIdeation(raw), [raw]);
   const badges = useMemo(
     () => extractIdeationBadges(ideation),
@@ -27,6 +30,12 @@ export function VideoOutput({ raw }: Props) {
   return (
     <div className="space-y-10">
       <IdeationBadges badges={badges} />
+
+      <CreativesSection
+        format="video"
+        raw={raw}
+        knowledgeBase={knowledgeBase}
+      />
 
       <div className="space-y-4">
         {parsed.segments.map((seg, idx) => (

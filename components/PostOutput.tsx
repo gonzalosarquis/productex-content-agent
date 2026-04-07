@@ -7,12 +7,15 @@ import {
 } from "@/lib/ideationBadges";
 import { parsePostOutput } from "@/lib/parsePost";
 import { IdeationBadges } from "./IdeationBadges";
+import { CreativesSection } from "./CreativesSection";
+import type { KnowledgeBase } from "@/lib/types";
 
 type Props = {
   raw: string;
+  knowledgeBase: KnowledgeBase;
 };
 
-export function PostOutput({ raw }: Props) {
+export function PostOutput({ raw, knowledgeBase }: Props) {
   const { ideation, body } = useMemo(() => splitPostIdeation(raw), [raw]);
   const badges = useMemo(
     () => extractIdeationBadges(ideation),
@@ -31,6 +34,12 @@ export function PostOutput({ raw }: Props) {
   return (
     <div className="space-y-10">
       <IdeationBadges badges={badges} />
+
+      <CreativesSection
+        format="post"
+        raw={raw}
+        knowledgeBase={knowledgeBase}
+      />
 
       <div className="rounded-2xl border border-neutral-200/90 bg-white p-10 shadow-sm">
         <p className="mb-3 text-xs font-semibold uppercase tracking-wide text-neutral-500">
