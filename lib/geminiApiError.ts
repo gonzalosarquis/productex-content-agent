@@ -5,6 +5,19 @@
 
 const RATE_LIMITS_URL = "https://ai.google.dev/gemini-api/docs/rate-limits";
 
+/** Texto único para 429 (API vs AI Studio tienen cuotas distintas). */
+function message429Actions(extra?: string): string {
+  const base =
+    "Error 429 — cuota agotada o demasiadas peticiones (por minuto o por día). " +
+    "Qué podés hacer: " +
+    "(1) En el servidor, fijá GEMINI_IMAGE_MODEL=gemini-2.5-flash-image (modelo base con más cupo en free tier). " +
+    "(2) Usá resolución 1K y generá menos slides por tanda. " +
+    "(3) En Google Cloud, habilitá facturación para el proyecto vinculado a tu API key si necesitás imágenes sin tope. " +
+    "(4) Esperá unos minutos o al reinicio diario de cuotas. " +
+    `Más info: ${RATE_LIMITS_URL}`;
+  return extra ? `${extra} ${base}` : base;
+}
+
 export function parseRetryAfterSecondsFromText(text: string): number | undefined {
   const m = text.match(/retry in ([\d.]+)s/i);
   if (m?.[1]) {
@@ -80,11 +93,11 @@ export function humanizeGeminiError(raw: string): string {
       const freeTier =
         /free_tier|limit:\s*0|quota exceeded/i.test(msg) ||
         /GenerateContent.*FreeTier/i.test(msg);
-      const billingHint = freeTier
-        ? " En el plan gratuito, la generación de imágenes suele tener cuota 0 o muy baja: activá facturación para el proyecto de Google Cloud asociado a tu API key (Google AI Studio → facturación), o esperá el reinicio de la cuota diaria."
-        : " Revisá plan y facturación del proyecto de la API key.";
-      const waitHint = wait ? ` Reintentá en ~${wait}s.` : "";
-      return `Cuota agotada o demasiadas peticiones (429).${billingHint}${waitHint} Detalle: ${RATE_LIMITS_URL}`;
+      const waitHint = wait ? ` Google pide esperar ~${wait}s antes de reintentar.` : "";
+      const tierHint = freeTier
+        ? " Tu cuenta marca free_tier con límite bajo o 0 para este modelo. "
+        : "";
+      return message429Actions(tierHint + waitHint);
     }
 
     if (code === 404) {
@@ -95,11 +108,11 @@ export function humanizeGeminiError(raw: string): string {
   }
 
   if (/429|RESOURCE_EXHAUSTED|quota exceeded|rate limit|free_tier/i.test(trimmed)) {
-    return `Cuota o límite de velocidad (429). Activá facturación si usás imágenes, o esperá. ${RATE_LIMITS_URL}`;
+    return message429Actions();
   }
 
   if (trimmed.startsWith("{")) {
-    return `Error de Gemini (respuesta no legible). Si ves 429, es cuota: ${RATE_LIMITS_URL}`;
+    return message429Actions();
   }
 
   return trimmed.slice(0, 500);

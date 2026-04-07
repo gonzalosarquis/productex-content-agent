@@ -278,7 +278,7 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
       </div>
 
       {error ? (
-        <p className="mb-3 max-w-full break-words text-sm leading-relaxed text-red-600">
+        <p className="mb-3 max-w-full whitespace-pre-wrap break-words text-sm leading-relaxed text-red-600">
           {error}
         </p>
       ) : null}
