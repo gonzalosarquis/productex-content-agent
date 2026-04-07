@@ -10,6 +10,7 @@ import {
   type CreativeModelId,
   type ImageSizeId,
 } from "@/lib/creativeModels";
+import { humanizeGeminiError } from "@/lib/geminiApiError";
 import { splitCarouselIdeation } from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
 import type { KnowledgeBase } from "@/lib/types";
@@ -33,8 +34,8 @@ function dataUrl(mime: string, b64: string) {
 
 export function CreativesSection({ format, raw, knowledgeBase }: Props) {
   const [model, setModel] = useState<CreativeModelId>(DEFAULT_CREATIVE_MODEL);
-  const [aspectRatio, setAspectRatio] = useState<AspectRatioId>("4:5");
-  const [imageSize, setImageSize] = useState<ImageSizeId>("2K");
+  const [aspectRatio, setAspectRatio] = useState<AspectRatioId>("3:4");
+  const [imageSize, setImageSize] = useState<ImageSizeId>("1K");
   const [busy, setBusy] = useState(false);
   const [busySlide, setBusySlide] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -80,13 +81,21 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
           }),
         });
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error ?? "Error al generar");
+        if (!res.ok) {
+          throw new Error(
+            humanizeGeminiError(String(data.error ?? "Error al generar")),
+          );
+        }
         setCarouselImages((prev) => ({
           ...prev,
           [slideIndex]: dataUrl(data.mimeType, data.data),
         }));
       } catch (e) {
-        setError(e instanceof Error ? e.message : "Error");
+        setError(
+          humanizeGeminiError(
+            e instanceof Error ? e.message : "Error",
+          ),
+        );
       } finally {
         setBusy(false);
         setBusySlide(null);
@@ -109,7 +118,11 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error al generar");
+      if (!res.ok) {
+        throw new Error(
+          humanizeGeminiError(String(data.error ?? "Error al generar")),
+        );
+      }
       const next: Record<number, string> = {};
       for (const item of data.results as BatchResultItem[]) {
         if (item.data && item.mimeType) {
@@ -119,12 +132,24 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
       setCarouselImages((prev) => ({ ...prev, ...next }));
       const errs = (data.results as BatchResultItem[]).filter((x) => x.error);
       if (errs.length > 0) {
+        const first = humanizeGeminiError(errs[0]?.error ?? "Error desconocido");
+        const rest = errs
+          .slice(0, 3)
+          .map(
+            (e) =>
+              `Slide ${e.slideIndex + 1}: ${humanizeGeminiError(e.error ?? "")}`,
+          )
+          .join(" · ");
         setError(
-          `${errs.length} slide(s) fallaron: ${errs.map((e) => e.slideIndex + 1).join(", ")}`,
+          errs.length === 1
+            ? `Slide ${errs[0]!.slideIndex + 1}: ${first}`
+            : `${errs.length} slides fallaron. ${rest}${errs.length > 3 ? "…" : ""}`,
         );
       }
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error");
+      setError(
+        humanizeGeminiError(e instanceof Error ? e.message : "Error"),
+      );
     } finally {
       setBusy(false);
     }
@@ -140,10 +165,16 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
         body: JSON.stringify({ ...payloadBase, format: "post" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error al generar");
+      if (!res.ok) {
+        throw new Error(
+          humanizeGeminiError(String(data.error ?? "Error al generar")),
+        );
+      }
       setPostImage(dataUrl(data.mimeType, data.data));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error");
+      setError(
+        humanizeGeminiError(e instanceof Error ? e.message : "Error"),
+      );
     } finally {
       setBusy(false);
     }
@@ -159,10 +190,16 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
         body: JSON.stringify({ ...payloadBase, format: "video" }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? "Error al generar");
+      if (!res.ok) {
+        throw new Error(
+          humanizeGeminiError(String(data.error ?? "Error al generar")),
+        );
+      }
       setVideoImage(dataUrl(data.mimeType, data.data));
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error");
+      setError(
+        humanizeGeminiError(e instanceof Error ? e.message : "Error"),
+      );
     } finally {
       setBusy(false);
     }
@@ -174,12 +211,19 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
         <h3 className="text-sm font-bold text-neutral-900">
           Creativos (Gemini / Nano Banana)
         </h3>
-        <p className="text-xs text-neutral-500">
+          <p className="text-xs text-neutral-500">
           Imágenes usando tu base de conocimiento. Configurá{" "}
           <code className="rounded bg-white px-1 py-0.5 text-[11px]">
             GEMINI_API_KEY
           </code>{" "}
-          (Google AI Studio) en el servidor.
+          (Google AI Studio) en el servidor.           En la API, el modelo con más cuota gratis suele ser{" "}
+          <strong>gemini-2.5-flash-image</strong> (elige «Gratis / base» arriba).
+          Podés fijarlo en el servidor con{" "}
+          <code className="rounded bg-white px-1 py-0.5 text-[11px]">
+            GEMINI_IMAGE_MODEL=gemini-2.5-flash-image
+          </code>{" "}
+          para ignorar otros modelos. Los *preview* a veces tienen cuota 0 en
+          free tier (error 429).
         </p>
       </div>
 
@@ -234,7 +278,9 @@ export function CreativesSection({ format, raw, knowledgeBase }: Props) {
       </div>
 
       {error ? (
-        <p className="mb-3 text-sm text-red-600">{error}</p>
+        <p className="mb-3 max-w-full break-words text-sm leading-relaxed text-red-600">
+          {error}
+        </p>
       ) : null}
 
       {format === "carousel" && carouselSlides.length === 0 ? (

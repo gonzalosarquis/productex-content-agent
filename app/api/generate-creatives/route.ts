@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import {
   ASPECT_RATIOS,
-  CREATIVE_MODELS,
-  DEFAULT_CREATIVE_MODEL,
   type AspectRatioId,
-  type CreativeModelId,
   type ImageSizeId,
 } from "@/lib/creativeModels";
 import {
@@ -13,6 +10,7 @@ import {
   buildVideoCreativePrompt,
 } from "@/lib/buildImagePrompt";
 import { generateGeminiImage } from "@/lib/geminiCreative";
+import { resolveGeminiImageModel } from "@/lib/resolveGeminiImageModel";
 import { splitCarouselIdeation, splitPostIdeation, splitVideoIdeation } from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
 import { parsePostOutput } from "@/lib/parsePost";
@@ -23,10 +21,6 @@ import type { KnowledgeBase } from "@/lib/types";
 export const runtime = "nodejs";
 
 const MAX_RAW = 600_000;
-
-function isCreativeModel(id: string): id is CreativeModelId {
-  return CREATIVE_MODELS.some((m) => m.id === id);
-}
 
 function isAspectRatio(id: string): id is AspectRatioId {
   return ASPECT_RATIOS.some((a) => a.id === id);
@@ -89,19 +83,17 @@ export async function POST(req: Request) {
       refs: "",
     };
 
-    const model: CreativeModelId = isCreativeModel(body.model ?? "")
-      ? (body.model as CreativeModelId)
-      : DEFAULT_CREATIVE_MODEL;
+    const model = resolveGeminiImageModel(body.model);
 
     const aspectRatio: AspectRatioId = isAspectRatio(body.aspectRatio ?? "")
       ? (body.aspectRatio as AspectRatioId)
-      : "4:5";
+      : "3:4";
 
     const imageSize = (["1K", "2K", "4K"] as const).includes(
       body.imageSize as ImageSizeId,
     )
       ? (body.imageSize as ImageSizeId)
-      : "2K";
+      : "1K";
 
     const arLabel = aspectLabel(aspectRatio);
 
@@ -188,7 +180,7 @@ export async function POST(req: Request) {
           results.push({ slideIndex: i, error: result.error });
         }
         if (i < slides.length - 1) {
-          await new Promise((r) => setTimeout(r, 120));
+          await new Promise((r) => setTimeout(r, 2500));
         }
       }
 
