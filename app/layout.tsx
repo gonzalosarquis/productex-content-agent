@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Bebas_Neue, DM_Sans } from "next/font/google";
+import { Plus_Jakarta_Sans } from "next/font/google";
 import "./globals.css";
 
-const bebas = Bebas_Neue({
-  weight: "400",
+const plusJakarta = Plus_Jakarta_Sans({
   subsets: ["latin"],
-  variable: "--font-bebas",
-});
-
-const dmSans = DM_Sans({
-  subsets: ["latin"],
-  variable: "--font-dm",
+  variable: "--font-plus-jakarta",
+  weight: ["400", "500", "600", "700"],
 });
 
 export const metadata: Metadata = {
@@ -26,7 +21,7 @@ export default function RootLayout({
   return (
     <html lang="es">
       <body
-        className={`${bebas.variable} ${dmSans.variable} min-h-screen antialiased`}
+        className={`${plusJakarta.variable} ${plusJakarta.className} min-h-screen antialiased`}
       >
         {children}
       </body>

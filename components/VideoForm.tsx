@@ -78,9 +78,9 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
   }
 
   return (
-    <div className="space-y-4 border-t border-neutral-200 pt-4">
-      <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">
-        Video / Reel
+    <div className="space-y-5 border-t border-neutral-200/90 pt-6">
+      <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+        Video / reel
       </p>
       <div className="space-y-2">
         {estilos.map((e) => {
@@ -90,10 +90,10 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
               key={e.id}
               type="button"
               onClick={() => onChange({ ...value, estilo: e.id })}
-              className={`w-full border px-3 py-3 text-left transition ${
+              className={`w-full rounded-xl border px-4 py-3.5 text-left transition ${
                 active
-                  ? "border-[#7C3AED] bg-violet-50"
-                  : "border-neutral-200 bg-white"
+                  ? "border-[#7C3AED] bg-violet-50 shadow-sm"
+                  : "border-neutral-200 bg-white hover:border-neutral-300"
               }`}
             >
               <div className="flex items-start gap-2">
@@ -122,7 +122,7 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
             value={value.tema}
             onChange={(e) => onChange({ ...value, tema: e.target.value })}
             disabled={suggestLoading === "tema"}
-            className="w-full border border-neutral-200 bg-white px-3 py-2 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] disabled:opacity-60"
+            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
           />
         </div>
       </div>
@@ -136,7 +136,7 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
               key={d}
               type="button"
               onClick={() => onChange({ ...value, duracion: d })}
-              className={`flex-1 border py-2 text-sm ${
+              className={`flex-1 rounded-lg border py-2.5 text-sm font-medium ${
                 value.duracion === d
                   ? "border-[#7C3AED] bg-violet-50 text-neutral-900"
                   : "border-neutral-200 text-neutral-500"
@@ -163,12 +163,12 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
             onChange={(e) => onChange({ ...value, contexto: e.target.value })}
             disabled={suggestLoading === "contexto"}
             rows={4}
-            className="w-full resize-none border border-neutral-200 bg-white px-3 py-2 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-1 focus:ring-[#7C3AED] disabled:opacity-60"
+            className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
           />
         </div>
       </div>
       {value.estilo === "tendencia" ? (
-        <label className="flex cursor-pointer items-center gap-3 border border-neutral-200 bg-neutral-50 px-3 py-3">
+        <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-200 bg-neutral-50/80 px-4 py-3.5">
           <input
             type="checkbox"
             checked={value.useTrends}

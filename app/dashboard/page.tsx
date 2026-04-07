@@ -153,15 +153,15 @@ export default function DashboardPage() {
           <button
             type="button"
             onClick={signOut}
-            className="mt-4 w-full border border-neutral-900 py-2.5 text-sm text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
+            className="mt-4 w-full rounded-xl border border-neutral-900 py-2.5 text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
           >
             Salir
           </button>
         }
       />
 
-      <main className="flex min-h-screen flex-1 flex-col bg-neutral-50/40">
-        <div className="flex border-b border-neutral-200 bg-white">
+      <main className="flex min-h-screen flex-1 flex-col bg-neutral-50/50">
+        <div className="flex flex-wrap gap-2 border-b border-neutral-200/90 bg-white px-8 py-5">
           {(
             [
               ["results", "Resultados"],
@@ -173,10 +173,10 @@ export default function DashboardPage() {
               key={id}
               type="button"
               onClick={() => setMainTab(id)}
-              className={`border-b-2 px-8 py-5 text-sm uppercase tracking-wider transition ${
+              className={`rounded-full px-4 py-2 text-sm font-medium transition ${
                 mainTab === id
-                  ? "border-[#7C3AED] text-neutral-900"
-                  : "border-transparent text-neutral-400 hover:text-neutral-700"
+                  ? "bg-[#7C3AED] text-white shadow-sm"
+                  : "text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900"
               }`}
             >
               {label}
@@ -184,25 +184,24 @@ export default function DashboardPage() {
           ))}
         </div>
 
-        <div className="flex-1 overflow-y-auto px-12 py-16">
+        <div className="flex-1 overflow-y-auto px-10 py-14 sm:px-14 sm:py-16">
           {mainTab === "results" ? (
             <div className="mx-auto max-w-3xl">
               {error ? (
                 <p className="mb-6 text-sm text-red-600">{error}</p>
               ) : null}
               {resultVariants.length > 1 ? (
-                <div className="mb-8 flex gap-2">
+                <div className="mb-8 flex flex-wrap gap-2">
                   {resultVariants.map((_, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => setViewIdx(i)}
-                      className={`border px-6 py-2 text-lg transition ${
+                      className={`rounded-full border px-5 py-2 text-sm font-medium transition ${
                         viewIdx === i
                           ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
                           : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                       }`}
-                      style={{ fontFamily: "var(--font-bebas), sans-serif" }}
                     >
                       Variante {i + 1}
                     </button>
@@ -211,7 +210,7 @@ export default function DashboardPage() {
               ) : null}
 
               {!rawView ? (
-                <p className="text-neutral-400">
+                <p className="text-sm leading-relaxed text-neutral-400">
                   Elegí formato, completá el brief y pulsá Generar.
                 </p>
               ) : resultFormat === "carousel" ? (

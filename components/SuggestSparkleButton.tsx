@@ -17,7 +17,7 @@ export function SuggestSparkleButton({
       onClick={onClick}
       disabled={loading}
       aria-label={ariaLabel}
-      className="flex h-6 w-6 shrink-0 items-center justify-center rounded border border-neutral-200 bg-white text-[#7C3AED] transition hover:border-[#7C3AED] hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-100"
+      className="flex h-7 w-7 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white text-[#7C3AED] transition hover:border-[#7C3AED] hover:bg-violet-50 disabled:cursor-not-allowed disabled:opacity-100"
     >
       {loading ? (
         <span

@@ -41,21 +41,16 @@ export function Sidebar({
   footer,
 }: Props) {
   return (
-    <aside className="flex h-screen w-[360px] shrink-0 flex-col border-r border-neutral-200 bg-white">
-      <div className="border-b border-neutral-200 px-8 py-10">
-        <h1
-          className="text-3xl tracking-wide text-neutral-900"
-          style={{ fontFamily: "var(--font-bebas), sans-serif" }}
-        >
+    <aside className="flex h-screen w-[380px] shrink-0 flex-col rounded-r-3xl border-r border-neutral-200/90 bg-white shadow-[4px_0_24px_-8px_rgba(0,0,0,0.06)]">
+      <div className="border-b border-neutral-200/90 px-9 py-12">
+        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">
           Productex Content Agent
         </h1>
-        <p className="mt-2 text-xs tracking-wide text-neutral-500">
-          @productexok
-        </p>
+        <p className="mt-2 text-sm text-neutral-500">@productexok</p>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 py-8">
-        <div className="space-y-8">
+      <div className="flex-1 overflow-y-auto px-9 py-10">
+        <div className="space-y-10">
           <FormatSelector value={format} onChange={onFormatChange} />
 
           {format === "carousel" ? (
@@ -80,8 +75,8 @@ export function Sidebar({
             />
           ) : null}
 
-          <div className="space-y-3 border-t border-neutral-200 pt-8">
-            <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">
+          <div className="space-y-3 border-t border-neutral-200/90 pt-10">
+            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
               Variantes
             </p>
             <div className="flex gap-2">
@@ -90,12 +85,11 @@ export function Sidebar({
                   key={n}
                   type="button"
                   onClick={() => onVariantsChange(n)}
-                  className={`flex-1 border py-3 text-xl transition ${
+                  className={`flex-1 rounded-xl border py-3 text-base font-semibold tabular-nums transition ${
                     variants === n
                       ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
-                      : "border-neutral-200 text-neutral-400 hover:border-neutral-300"
+                      : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                   }`}
-                  style={{ fontFamily: "var(--font-bebas), sans-serif" }}
                 >
                   {n}
                 </button>
@@ -105,13 +99,12 @@ export function Sidebar({
         </div>
       </div>
 
-      <div className="border-t border-neutral-200 bg-neutral-50/80 px-8 py-8">
+      <div className="border-t border-neutral-200/90 bg-neutral-50/60 px-9 py-8">
         <button
           type="button"
           onClick={onGenerate}
           disabled={generating}
-          className="w-full bg-[#7C3AED] py-4 text-xl tracking-wide text-white transition hover:bg-[#6d28d9] disabled:opacity-50"
-          style={{ fontFamily: "var(--font-bebas), sans-serif" }}
+          className="w-full rounded-xl bg-[#7C3AED] py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d28d9] disabled:opacity-50"
         >
           {generating ? "Generando…" : "Generar"}
         </button>

@@ -8,14 +8,17 @@
   --color-border: #e5e5e5;
   --color-border-strong: #0a0a0a;
   --color-card: #fafafa;
-  --font-display: var(--font-bebas);
-  --font-sans: var(--font-dm);
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --font-sans: var(--font-plus-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
 body {
   background: var(--color-bg);
   color: var(--color-fg);
-  font-family: var(--font-dm), system-ui, sans-serif;
 }
 
 ::selection {

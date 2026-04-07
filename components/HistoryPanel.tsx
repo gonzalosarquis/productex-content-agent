@@ -31,7 +31,7 @@ export function HistoryPanel() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-xs uppercase tracking-[0.2em] text-neutral-400">
+        <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
           Últimas generaciones
         </p>
         <button
@@ -57,17 +57,14 @@ export function HistoryPanel() {
             return (
               <li
                 key={g.id}
-                className="border border-neutral-200 bg-white shadow-sm"
+                className="overflow-hidden rounded-xl border border-neutral-200/90 bg-white shadow-sm"
               >
                 <button
                   type="button"
                   onClick={() => setOpenId(open ? null : g.id)}
-                  className="flex w-full items-start justify-between gap-4 px-4 py-4 text-left transition hover:bg-neutral-50"
+                  className="flex w-full items-start justify-between gap-4 px-4 py-4 text-left transition hover:bg-neutral-50/80"
                 >
-                  <span
-                    className="text-sm text-neutral-900"
-                    style={{ fontFamily: "var(--font-bebas), sans-serif" }}
-                  >
+                  <span className="text-sm font-medium capitalize text-neutral-900">
                     {g.format} · {g.subtype}
                   </span>
                   <span className="shrink-0 text-xs text-neutral-400">
@@ -75,7 +72,7 @@ export function HistoryPanel() {
                   </span>
                 </button>
                 {open ? (
-                  <div className="border-t border-neutral-200 bg-neutral-50 px-4 py-4">
+                  <div className="border-t border-neutral-200/90 bg-neutral-50/80 px-4 py-4">
                     <p className="mb-2 text-xs text-neutral-500">{g.producto}</p>
                     <pre className="max-h-64 overflow-auto whitespace-pre-wrap text-xs text-neutral-700">
                       {raw}
