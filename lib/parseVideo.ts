@@ -8,11 +8,20 @@ export interface ParsedVideo {
   musica: string;
   caption: string;
   hashtags: string;
+  notaEdicion: string;
   rawFooter: string;
 }
 
-const headerRe =
-  /^(HOOK\s+VISUAL|CIERRE|CORTE\s+\d+[^\n]*|\[[^\]]+\]\s*[^\n]*)/i;
+function isVideoSegmentHeader(line: string): boolean {
+  const t = line.trim();
+  if (!t.startsWith("[")) return false;
+  return (
+    /\d\s*s\s*[-–]\s*\d/.test(t) ||
+    /\]\s*HOOK\b/i.test(t) ||
+    /\]\s*DESARROLLO/i.test(t) ||
+    /\]\s*CIERRE/i.test(t)
+  );
+}
 
 export function parseVideoOutput(raw: string): ParsedVideo {
   const parts = raw.split(/\n---\s*\n/);
@@ -21,7 +30,10 @@ export function parseVideoOutput(raw: string): ParsedVideo {
 
   const musicaMatch = footer.match(/MÚSICA SUGERIDA:\s*([\s\S]*?)(?=CAPTION:|$)/i);
   const captionMatch = footer.match(/CAPTION:\s*([\s\S]*?)(?=HASHTAGS:|$)/i);
-  const hashtagsMatch = footer.match(/HASHTAGS:\s*([\s\S]*?)$/im);
+  const hashtagsMatch = footer.match(/HASHTAGS:\s*([\s\S]*?)(?=NOTA DE EDICIÓN:|$)/im);
+  const notaMatch = footer.match(
+    /NOTA DE EDICIÓN:\s*([\s\S]*?)$/im,
+  );
 
   const lines = main.split(/\r?\n/);
   const segments: VideoSegment[] = [];
@@ -37,7 +49,7 @@ export function parseVideoOutput(raw: string): ParsedVideo {
   for (const line of lines) {
     const t = line.trim();
     if (!t) continue;
-    if (headerRe.test(t)) {
+    if (isVideoSegmentHeader(t)) {
       flush();
       current = { header: t, lines: [] };
       continue;
@@ -46,7 +58,7 @@ export function parseVideoOutput(raw: string): ParsedVideo {
       current = { header: "Bloque", lines: [] };
     }
     const kv = t.match(/^([^:]+):\s*(.+)$/);
-    if (kv && kv[1].length < 40) {
+    if (kv && kv[1].length < 48) {
       current.lines.push({ label: kv[1].trim(), text: kv[2].trim() });
     } else {
       current.lines.push({ label: "", text: t });
@@ -55,7 +67,10 @@ export function parseVideoOutput(raw: string): ParsedVideo {
   flush();
 
   if (segments.length === 0) {
-    segments.push({ header: "Script", lines: [{ label: "", text: main.trim() }] });
+    segments.push({
+      header: "Script",
+      lines: [{ label: "", text: main.trim() }],
+    });
   }
 
   return {
@@ -63,6 +78,7 @@ export function parseVideoOutput(raw: string): ParsedVideo {
     musica: musicaMatch?.[1]?.trim() ?? "",
     caption: captionMatch?.[1]?.trim() ?? "",
     hashtags: hashtagsMatch?.[1]?.trim().replace(/\n/g, " ") ?? "",
+    notaEdicion: notaMatch?.[1]?.trim() ?? "",
     rawFooter: footer,
   };
 }

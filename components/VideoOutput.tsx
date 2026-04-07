@@ -1,14 +1,24 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+  extractIdeationBadges,
+  splitVideoIdeation,
+} from "@/lib/ideationBadges";
 import { parseVideoOutput } from "@/lib/parseVideo";
+import { IdeationBadges } from "./IdeationBadges";
 
 type Props = {
   raw: string;
 };
 
 export function VideoOutput({ raw }: Props) {
-  const parsed = useMemo(() => parseVideoOutput(raw), [raw]);
+  const { ideation, body } = useMemo(() => splitVideoIdeation(raw), [raw]);
+  const badges = useMemo(
+    () => extractIdeationBadges(ideation),
+    [ideation],
+  );
+  const parsed = useMemo(() => parseVideoOutput(body), [body]);
 
   async function copy(text: string) {
     await navigator.clipboard.writeText(text);
@@ -16,6 +26,8 @@ export function VideoOutput({ raw }: Props) {
 
   return (
     <div className="space-y-8">
+      <IdeationBadges badges={badges} />
+
       <div className="space-y-4">
         {parsed.segments.map((seg, idx) => (
           <div
@@ -67,6 +79,16 @@ export function VideoOutput({ raw }: Props) {
           </p>
           <p className="text-sm text-[#c8ff00]/90">{parsed.hashtags || "—"}</p>
         </div>
+        {parsed.notaEdicion ? (
+          <div>
+            <p className="mb-1 text-xs uppercase tracking-wider text-[#f5f2ec]/40">
+              Nota de edición
+            </p>
+            <p className="whitespace-pre-wrap text-sm text-[#f5f2ec]/85">
+              {parsed.notaEdicion}
+            </p>
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-wrap gap-3">

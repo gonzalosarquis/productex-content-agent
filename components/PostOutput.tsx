@@ -1,14 +1,24 @@
 "use client";
 
 import { useMemo } from "react";
+import {
+  extractIdeationBadges,
+  splitPostIdeation,
+} from "@/lib/ideationBadges";
 import { parsePostOutput } from "@/lib/parsePost";
+import { IdeationBadges } from "./IdeationBadges";
 
 type Props = {
   raw: string;
 };
 
 export function PostOutput({ raw }: Props) {
-  const parsed = useMemo(() => parsePostOutput(raw), [raw]);
+  const { ideation, body } = useMemo(() => splitPostIdeation(raw), [raw]);
+  const badges = useMemo(
+    () => extractIdeationBadges(ideation),
+    [ideation],
+  );
+  const parsed = useMemo(() => parsePostOutput(body), [body]);
 
   async function copy(text: string) {
     await navigator.clipboard.writeText(text);
@@ -20,6 +30,8 @@ export function PostOutput({ raw }: Props) {
 
   return (
     <div className="space-y-8">
+      <IdeationBadges badges={badges} />
+
       <div className="border border-[#2a2a2a] bg-[#1a1a1a] p-8">
         <p className="mb-3 text-xs uppercase tracking-[0.2em] text-[#f5f2ec]/40">
           Hook

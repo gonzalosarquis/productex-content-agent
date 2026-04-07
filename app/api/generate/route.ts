@@ -8,6 +8,7 @@ import {
   createServiceRoleClient,
 } from "@/lib/supabase-server";
 import { buildSystemPrompt } from "@/lib/systemPrompt";
+import { fetchTrendsContext } from "@/lib/trendsResearch";
 import type { KnowledgeBase } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -48,38 +49,45 @@ export async function POST(req: Request) {
     const system = buildSystemPrompt(kb);
     let userPrompt: string;
 
+    let trendsContext: string | undefined;
+    if (body.format === "video" && Boolean(body.useTrends)) {
+      trendsContext = await fetchTrendsContext(body.tema);
+    }
+
     if (body.format === "carousel") {
       userPrompt = buildCarouselPrompt({
-        subtipo: body.subtype,
+        subtype: body.subtype,
         tema: body.tema,
         slides: body.slides ?? 6,
         contexto: body.contexto,
         tono: body.tono,
         variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+        trendsContext,
       });
     } else if (body.format === "video") {
       userPrompt = buildVideoPrompt({
-        estilo: body.subtype,
+        style: body.subtype,
         tema: body.tema,
         duracion: body.duracion ?? "30s",
         contexto: body.contexto,
-        useTrends: Boolean(body.useTrends),
         variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+        trendsContext,
       });
     } else {
       userPrompt = buildPostPrompt({
-        subtipo: body.subtype,
-        producto: body.tema,
+        subtype: body.subtype,
+        tema: body.tema,
         contexto: body.contexto,
         tono: body.tono,
         variants: Math.min(Math.max(body.variants ?? 1, 1), 3),
+        trendsContext,
       });
     }
 
     const raw = await generateWithClaude({
       system,
       user: userPrompt,
-      useTrends: body.format === "video" && Boolean(body.useTrends),
+      useTrends: false,
     });
 
     const variants = splitVariants(raw);

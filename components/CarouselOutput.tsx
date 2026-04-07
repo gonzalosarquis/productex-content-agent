@@ -1,7 +1,12 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import {
+  extractIdeationBadges,
+  splitCarouselIdeation,
+} from "@/lib/ideationBadges";
 import { parseCarouselOutput } from "@/lib/parseCarousel";
+import { IdeationBadges } from "./IdeationBadges";
 
 type Props = {
   raw: string;
@@ -14,7 +19,15 @@ function kindLabel(k: string) {
 }
 
 export function CarouselOutput({ raw }: Props) {
-  const parsed = useMemo(() => parseCarouselOutput(raw), [raw]);
+  const { ideation, body } = useMemo(
+    () => splitCarouselIdeation(raw),
+    [raw],
+  );
+  const badges = useMemo(
+    () => extractIdeationBadges(ideation),
+    [ideation],
+  );
+  const parsed = useMemo(() => parseCarouselOutput(body), [body]);
   const [i, setI] = useState(0);
 
   useEffect(() => {
@@ -31,6 +44,8 @@ export function CarouselOutput({ raw }: Props) {
 
   return (
     <div className="space-y-8">
+      <IdeationBadges badges={badges} />
+
       {slide ? (
         <div className="relative border border-[#2a2a2a] bg-[#1a1a1a] p-8">
           <div className="mb-6 flex items-center justify-between">
