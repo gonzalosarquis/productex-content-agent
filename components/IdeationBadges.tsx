@@ -7,7 +7,7 @@ type Props = {
 };
 
 const badgeStyle =
-  "rounded-full border border-neutral-200/90 bg-neutral-50/90 px-3 py-1.5 text-xs font-medium text-neutral-700";
+  "rounded-full border border-neutral-200/90 bg-neutral-50/90 px-3 py-1.5 text-xs font-semibold text-neutral-800";
 
 export function IdeationBadges({ badges }: Props) {
   const items: { key: string; label: string; value: string }[] = [];
@@ -30,7 +30,7 @@ export function IdeationBadges({ badges }: Props) {
     <div className="mb-8 flex flex-wrap gap-2 border-b border-neutral-200/90 pb-6">
       {items.map((item) => (
         <span key={item.key} className={badgeStyle} title={item.value}>
-          <span className="text-neutral-400">{item.label}: </span>
+          <span className="font-bold text-neutral-500">{item.label}: </span>
           {item.value}
         </span>
       ))}

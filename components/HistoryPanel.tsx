@@ -31,13 +31,13 @@ export function HistoryPanel() {
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
           Últimas generaciones
         </p>
         <button
           type="button"
           onClick={load}
-          className="text-xs text-[#7C3AED] hover:underline"
+          className="text-xs font-semibold text-neutral-900 underline-offset-4 hover:underline"
         >
           Actualizar
         </button>

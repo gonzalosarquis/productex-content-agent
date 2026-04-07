@@ -79,7 +79,7 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
 
   return (
     <div className="space-y-5 border-t border-neutral-200/90 pt-6">
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
         Video / reel
       </p>
       <div className="space-y-2">
@@ -92,14 +92,14 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
               onClick={() => onChange({ ...value, estilo: e.id })}
               className={`w-full rounded-xl border px-4 py-3.5 text-left transition ${
                 active
-                  ? "border-[#7C3AED] bg-violet-50 shadow-sm"
+                  ? "border-neutral-900 bg-neutral-100 shadow-sm"
                   : "border-neutral-200 bg-white hover:border-neutral-300"
               }`}
             >
               <div className="flex items-start gap-2">
                 <span className="text-lg">{e.icon}</span>
                 <div>
-                  <p className="text-sm font-medium text-neutral-900">{e.title}</p>
+                  <p className="text-sm font-semibold text-neutral-900">{e.title}</p>
                   <p className="text-xs text-neutral-500">{e.desc}</p>
                 </div>
               </div>
@@ -109,7 +109,9 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
       </div>
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="text-xs text-neutral-500">Tema o producto</label>
+          <label className="text-xs font-semibold text-neutral-700">
+            Tema o producto
+          </label>
           <SuggestSparkleButton
             loading={suggestLoading === "tema"}
             onClick={() => handleSuggest("tema")}
@@ -122,12 +124,12 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
             value={value.tema}
             onChange={(e) => onChange({ ...value, tema: e.target.value })}
             disabled={suggestLoading === "tema"}
-            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
+            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15 disabled:opacity-60"
           />
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-xs text-neutral-500">
+        <label className="mb-1 block text-xs font-semibold text-neutral-700">
           Duración
         </label>
         <div className="flex gap-2">
@@ -136,9 +138,9 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
               key={d}
               type="button"
               onClick={() => onChange({ ...value, duracion: d })}
-              className={`flex-1 rounded-lg border py-2.5 text-sm font-medium ${
+              className={`flex-1 rounded-lg border py-2.5 text-sm font-semibold ${
                 value.duracion === d
-                  ? "border-[#7C3AED] bg-violet-50 text-neutral-900"
+                  ? "border-neutral-900 bg-neutral-100 text-neutral-900"
                   : "border-neutral-200 text-neutral-500"
               }`}
             >
@@ -149,7 +151,9 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
       </div>
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="text-xs text-neutral-500">Contexto adicional</label>
+          <label className="text-xs font-semibold text-neutral-700">
+            Contexto adicional
+          </label>
           <SuggestSparkleButton
             loading={suggestLoading === "contexto"}
             onClick={() => handleSuggest("contexto")}
@@ -163,7 +167,7 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
             onChange={(e) => onChange({ ...value, contexto: e.target.value })}
             disabled={suggestLoading === "contexto"}
             rows={4}
-            className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
+            className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15 disabled:opacity-60"
           />
         </div>
       </div>
@@ -175,9 +179,9 @@ export function VideoForm({ value, onChange, knowledgeBase }: Props) {
             onChange={(e) =>
               onChange({ ...value, useTrends: e.target.checked })
             }
-            className="h-4 w-4 accent-[#7C3AED]"
+            className="h-4 w-4 accent-neutral-900"
           />
-          <span className="text-sm text-neutral-800">
+          <span className="text-sm font-medium text-neutral-800">
             Buscar tendencias actuales (web search)
           </span>
         </label>

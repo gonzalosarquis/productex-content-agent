@@ -49,14 +49,14 @@ export function CarouselOutput({ raw }: Props) {
       {slide ? (
         <div className="relative rounded-2xl border border-neutral-200/90 bg-white p-10 shadow-sm">
           <div className="mb-8 flex items-center justify-between">
-            <span className="text-3xl font-semibold tabular-nums tracking-tight text-[#7C3AED]">
+            <span className="text-3xl font-bold tabular-nums tracking-tight text-neutral-900">
               {String(slide.index).padStart(2, "0")}/{String(total).padStart(2, "0")}
             </span>
-            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-medium uppercase tracking-wide text-neutral-500">
+            <span className="rounded-full border border-neutral-200 bg-neutral-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-neutral-600">
               {kindLabel(slide.kind)}
             </span>
           </div>
-          <p className="mb-4 text-lg font-semibold leading-snug text-neutral-900">
+          <p className="mb-4 text-lg font-bold leading-snug text-neutral-900">
             {slide.label}
           </p>
           <p className="whitespace-pre-wrap text-sm leading-relaxed text-neutral-700">
@@ -67,7 +67,7 @@ export function CarouselOutput({ raw }: Props) {
               type="button"
               onClick={() => setI((v) => Math.max(0, v - 1))}
               disabled={i <= 0}
-              className="rounded-lg border border-neutral-900 px-4 py-2 text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white disabled:opacity-30"
+              className="rounded-lg border border-neutral-900 px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-900 hover:text-white disabled:opacity-30"
             >
               ← anterior
             </button>
@@ -75,7 +75,7 @@ export function CarouselOutput({ raw }: Props) {
               type="button"
               onClick={() => setI((v) => Math.min(total - 1, v + 1))}
               disabled={i >= total - 1}
-              className="rounded-lg border border-neutral-900 px-4 py-2 text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white disabled:opacity-30"
+              className="rounded-lg border border-neutral-900 px-4 py-2 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-900 hover:text-white disabled:opacity-30"
             >
               siguiente →
             </button>
@@ -84,30 +84,30 @@ export function CarouselOutput({ raw }: Props) {
       ) : null}
 
       <div className="rounded-2xl border border-neutral-200/90 bg-white p-8 shadow-sm">
-        <p className="mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
           Caption
         </p>
         <p className="whitespace-pre-wrap text-sm text-neutral-800">
           {parsed.caption || "—"}
         </p>
-        <p className="mt-6 mb-2 text-xs font-medium uppercase tracking-wide text-neutral-400">
+        <p className="mt-6 mb-2 text-xs font-semibold uppercase tracking-wide text-neutral-500">
           Hashtags
         </p>
-        <p className="text-sm text-[#7C3AED]">{parsed.hashtags || "—"}</p>
+        <p className="text-sm font-semibold text-neutral-900">{parsed.hashtags || "—"}</p>
       </div>
 
       <div className="flex flex-wrap gap-3">
         <button
           type="button"
           onClick={() => copy(allText)}
-          className="rounded-lg bg-[#7C3AED] px-6 py-2.5 text-sm font-medium text-white shadow-sm transition hover:bg-[#6d28d9]"
+          className="rounded-lg bg-neutral-900 px-6 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800"
         >
           Copiar todo
         </button>
         <button
           type="button"
           onClick={() => copy(parsed.caption)}
-          className="rounded-lg border border-neutral-900 px-6 py-2.5 text-sm font-medium text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
+          className="rounded-lg border border-neutral-900 px-6 py-2.5 text-sm font-semibold text-neutral-900 transition hover:bg-neutral-900 hover:text-white"
         >
           Copiar caption
         </button>

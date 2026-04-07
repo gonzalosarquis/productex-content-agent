@@ -4,7 +4,7 @@
   --color-bg: #ffffff;
   --color-fg: #0a0a0a;
   --color-fg-muted: #737373;
-  --color-accent: #7c3aed;
+  --color-accent: #0a0a0a;
   --color-border: #e5e5e5;
   --color-border-strong: #0a0a0a;
   --color-card: #fafafa;
@@ -22,6 +22,6 @@ body {
 }
 
 ::selection {
-  background: color-mix(in srgb, #7c3aed 18%, transparent);
+  background: color-mix(in srgb, #0a0a0a 12%, transparent);
   color: var(--color-fg);
 }

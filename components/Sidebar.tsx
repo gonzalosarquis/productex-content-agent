@@ -43,7 +43,7 @@ export function Sidebar({
   return (
     <aside className="flex h-screen w-[380px] shrink-0 flex-col rounded-r-3xl border-r border-neutral-200/90 bg-white shadow-[4px_0_24px_-8px_rgba(0,0,0,0.06)]">
       <div className="border-b border-neutral-200/90 px-9 py-12">
-        <h1 className="text-xl font-semibold tracking-tight text-neutral-900">
+        <h1 className="text-xl font-bold tracking-tight text-neutral-900">
           Productex Content Agent
         </h1>
         <p className="mt-2 text-sm text-neutral-500">@productexok</p>
@@ -76,7 +76,7 @@ export function Sidebar({
           ) : null}
 
           <div className="space-y-3 border-t border-neutral-200/90 pt-10">
-            <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+            <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
               Variantes
             </p>
             <div className="flex gap-2">
@@ -85,9 +85,9 @@ export function Sidebar({
                   key={n}
                   type="button"
                   onClick={() => onVariantsChange(n)}
-                  className={`flex-1 rounded-xl border py-3 text-base font-semibold tabular-nums transition ${
+                  className={`flex-1 rounded-xl border py-3 text-base font-bold tabular-nums transition ${
                     variants === n
-                      ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
+                      ? "border-neutral-900 bg-neutral-100 text-neutral-900"
                       : "border-neutral-200 text-neutral-500 hover:border-neutral-300"
                   }`}
                 >
@@ -104,7 +104,7 @@ export function Sidebar({
           type="button"
           onClick={onGenerate}
           disabled={generating}
-          className="w-full rounded-xl bg-[#7C3AED] py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d28d9] disabled:opacity-50"
+          className="w-full rounded-xl bg-neutral-900 py-3.5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:opacity-50"
         >
           {generating ? "Generando…" : "Generar"}
         </button>

@@ -68,7 +68,7 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
 
   return (
     <div className="space-y-5 border-t border-neutral-200/90 pt-6">
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
         Carrusel
       </p>
       <div className="grid grid-cols-2 gap-2">
@@ -77,9 +77,9 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
             key={s.id}
             type="button"
             onClick={() => onChange({ ...value, subtipo: s.id })}
-            className={`rounded-lg border px-3 py-2.5 text-sm font-medium transition ${
+            className={`rounded-lg border px-3 py-2.5 text-sm font-semibold transition ${
               value.subtipo === s.id
-                ? "border-[#7C3AED] bg-violet-50 text-neutral-900"
+                ? "border-neutral-900 bg-neutral-100 text-neutral-900"
                 : "border-neutral-200 text-neutral-600 hover:border-neutral-300 hover:text-neutral-900"
             }`}
           >
@@ -89,7 +89,9 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
       </div>
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="text-xs text-neutral-500">Tema o producto</label>
+          <label className="text-xs font-semibold text-neutral-700">
+            Tema o producto
+          </label>
           <SuggestSparkleButton
             loading={suggestLoading === "tema"}
             onClick={() => handleSuggest("tema")}
@@ -102,13 +104,13 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
             value={value.tema}
             onChange={(e) => onChange({ ...value, tema: e.target.value })}
             disabled={suggestLoading === "tema"}
-            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
+            className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15 disabled:opacity-60"
             placeholder="Ej: buzos frisa / mínimos express"
           />
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-xs text-neutral-500">
+        <label className="mb-1 block text-xs font-semibold text-neutral-700">
           Cantidad de slides
         </label>
         <div className="flex gap-2">
@@ -117,9 +119,9 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
               key={n}
               type="button"
               onClick={() => onChange({ ...value, slides: n })}
-              className={`flex-1 rounded-lg border py-2.5 text-sm font-medium ${
+              className={`flex-1 rounded-lg border py-2.5 text-sm font-semibold ${
                 value.slides === n
-                  ? "border-[#7C3AED] bg-violet-50 text-neutral-900"
+                  ? "border-neutral-900 bg-neutral-100 text-neutral-900"
                   : "border-neutral-200 text-neutral-500"
               }`}
             >
@@ -130,7 +132,9 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
       </div>
       <div>
         <div className="mb-1 flex items-center justify-between gap-2">
-          <label className="text-xs text-neutral-500">Contexto adicional</label>
+          <label className="text-xs font-semibold text-neutral-700">
+            Contexto adicional
+          </label>
           <SuggestSparkleButton
             loading={suggestLoading === "contexto"}
             onClick={() => handleSuggest("contexto")}
@@ -144,22 +148,22 @@ export function CarouselForm({ value, onChange, knowledgeBase }: Props) {
             onChange={(e) => onChange({ ...value, contexto: e.target.value })}
             disabled={suggestLoading === "contexto"}
             rows={4}
-            className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20 disabled:opacity-60"
+            className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 pr-10 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15 disabled:opacity-60"
             placeholder="Detalle lo que tiene que resolver el carrusel…"
           />
         </div>
       </div>
       <div>
-        <p className="mb-2 text-xs text-neutral-500">Tono (multi)</p>
+        <p className="mb-2 text-xs font-semibold text-neutral-700">Tono (multi)</p>
         <div className="flex flex-wrap gap-2">
           {tonos.map((t) => (
             <button
               key={t}
               type="button"
               onClick={() => toggleTono(t)}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+              className={`rounded-full border px-3 py-1.5 text-xs font-semibold ${
                 value.tono.includes(t)
-                  ? "border-[#7C3AED] bg-violet-50 text-[#7C3AED]"
+                  ? "border-neutral-900 bg-neutral-100 text-neutral-900"
                   : "border-neutral-200 text-neutral-500"
               }`}
             >

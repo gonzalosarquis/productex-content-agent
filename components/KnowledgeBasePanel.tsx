@@ -97,7 +97,7 @@ export function KnowledgeBasePanel({
   function field<K extends keyof KnowledgeBase>(key: K, label: string) {
     return (
       <div>
-        <label className="mb-1.5 block text-xs font-medium text-neutral-500">
+        <label className="mb-1.5 block text-xs font-semibold text-neutral-700">
           {label}
         </label>
         <textarea
@@ -108,7 +108,7 @@ export function KnowledgeBasePanel({
             onKbChange?.(next);
           }}
           rows={key === "examples" || key === "products" ? 5 : 3}
-          className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-[#7C3AED] focus:ring-2 focus:ring-[#7C3AED]/20"
+          className="w-full resize-none rounded-lg border border-neutral-200 bg-white px-3 py-2.5 text-sm text-neutral-900 outline-none transition focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/15"
         />
       </div>
     );
@@ -132,7 +132,7 @@ export function KnowledgeBasePanel({
           type="button"
           onClick={save}
           disabled={saving}
-          className="rounded-xl bg-[#7C3AED] px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-[#6d28d9] disabled:opacity-50"
+          className="rounded-xl bg-neutral-900 px-8 py-2.5 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:opacity-50"
         >
           {saving ? "Guardando…" : "Guardar base"}
         </button>

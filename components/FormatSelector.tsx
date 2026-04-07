@@ -16,7 +16,7 @@ type Props = {
 export function FormatSelector({ value, onChange }: Props) {
   return (
     <div className="space-y-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-neutral-400">
+      <p className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
         Formato
       </p>
       <div className="grid grid-cols-1 gap-2.5">
@@ -27,9 +27,9 @@ export function FormatSelector({ value, onChange }: Props) {
               key={o.id}
               type="button"
               onClick={() => onChange(o.id)}
-              className={`flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-medium transition ${
+              className={`flex items-center gap-3 rounded-xl border px-4 py-3.5 text-left text-sm font-semibold transition ${
                 active
-                  ? "border-[#7C3AED] bg-violet-50 text-neutral-900 shadow-sm"
+                  ? "border-neutral-900 bg-neutral-100 text-neutral-900 shadow-sm"
                   : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300"
               }`}
             >
